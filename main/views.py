@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from .models import User
-from django.http import HttpResponse
 import bcrypt
-# Create your views here.
+from .api import get_movies
 
 
 class IndexView(View):
@@ -12,7 +11,9 @@ class IndexView(View):
             request.COOKIES['user-identity']
         except KeyError:
             return redirect("main:login")
-        return render(request, "main/index.html", context={"user": User.objects.get(uuid=request.COOKIES['user-identity'])})
+        mov_list = get_movies()
+        print(*mov_list, sep="\n")
+        return render(request, "main/index.html", context={"user": User.objects.get(uuid=request.COOKIES['user-identity']), "movies": mov_list[0:6]})
 
 
 class LoginView(View):
@@ -22,10 +23,8 @@ class LoginView(View):
         return render(request, "main/login.html")
 
     def post(self, request):
-        email = request.POST['email']
-        password = request.POST['password']
-        if bcrypt.checkpw(bytes(password, 'utf-8'), User.objects.get(email=email).password):
-            user = User.objects.get(email=email)
+        user = User.authenticate(User, request)
+        if user:
             resp = redirect("main:index")
             resp.set_cookie('user-identity', user.uuid)
             return resp
@@ -62,3 +61,8 @@ class LogoutView(View):
         resp = redirect("main:login")
         resp.delete_cookie('user-identity')
         return resp
+
+
+class MovieView(View):
+    def get(self, request):
+        return render(request, "main/movie.html", context={"movie": get_movies()})

@@ -2,7 +2,6 @@ from django.db import models
 import uuid
 import bcrypt
 from django.shortcuts import redirect
-# Create your models here.
 
 
 class User(models.Model):
@@ -19,7 +18,11 @@ class User(models.Model):
         pass
 
     def authenticate(self, request):
-        pass
+        email = request.POST['email']
+        password = request.POST['password']
+        if bcrypt.checkpw(bytes(password, 'utf-8'), User.objects.get(email=email).password):
+            user = User.objects.get(email=email)
+            return user
 
     @staticmethod
     def get_user(request, path):
@@ -42,4 +45,14 @@ class SuperAdmin(models.Model):
 
 
 class TheatreAdmin(models.Model):
+    pass
+
+
+# add logging later
+class Log(models.Model):
+    info = models.CharField(max_length=1000)
+    time = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=255, choices=[(
+        'INFO', 'INFO'), ('ERROR', 'ERROR'), ('WARNING', 'WARNING')])
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     pass
