@@ -64,8 +64,9 @@ class Transaction(models.Model):
     time = models.DateTimeField(auto_now_add=True)
     amount = models.IntegerField()
     type = models.CharField(max_length=255, choices=[(
-        "add", "add"), ("withdraw", "withdraw"), ("refund", "refund"), ("ticket", "ticket"), ("food", "food")])
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+        "add", "add"), ("withdraw", "withdraw"), ("refund", "refund"), ("ticket", "ticket"), ("food", "food")], null=True)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True)
     otp = models.IntegerField(default=gen_otp(), unique=False, editable=False)
     id = models.UUIDField(default=uuid.uuid4, editable=False,
                           unique=True, primary_key=True)
@@ -113,10 +114,11 @@ class Ticket(models.Model):
     booked_date = models.DateTimeField(auto_now_add=True)
     price = models.IntegerField(default=100)
     transaction = models.ForeignKey(
-        Transaction, on_delete=models.CASCADE)
+        Transaction, on_delete=models.CASCADE, null=True)
     food_orders = models.JSONField(default=None, null=True)
     cancelled = models.BooleanField(default=False)
-    show = models.ForeignKey(Show, on_delete=models.CASCADE)
+    show = models.ForeignKey(
+        Show, on_delete=models.CASCADE, null=True, default=None)
     used = models.BooleanField(default=False)
     tickets = models.IntegerField(default=1)
 
