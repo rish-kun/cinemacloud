@@ -8,6 +8,7 @@ class Movie():
     poster_base_url = "https://image.tmdb.org/t/p/w500"
 
     def __init__(self, adult, title, overview, poster_path, release_date, vote_average, popularity, language, backdrop_path, id):
+        self.id = id
         self.title = title
         self.popularity = popularity
         self.adult = adult
@@ -17,7 +18,6 @@ class Movie():
         self.vote_average = vote_average
         self.language = language
         self.backdrop_path = self.poster_base_url + backdrop_path
-        self.id = id
 
     def __str__(self):
         return f"{self.title}"

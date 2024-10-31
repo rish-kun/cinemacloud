@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import User, Ticket, Transaction
+from .models import User, Ticket, Transaction, Movie
 import bcrypt
-from .api import get_movies, get_movie
 
 
 class IndexView(View):
@@ -11,7 +10,7 @@ class IndexView(View):
             request.COOKIES['user-identity']
         except KeyError:
             return redirect("main:login")
-        mov_list = get_movies()
+        mov_list = Movie.objects.all()
         for z in mov_list:
             print(z.id)
         return render(request, "main/index.html", context={"user": User.objects.get(uuid=request.COOKIES['user-identity']), "movies": mov_list})
@@ -66,13 +65,13 @@ class LogoutView(View):
 
 class MovieView(View):
     def get(self, request, movie_id):
-        mov = get_movie(movie_id)
+        mov = Movie.objects.get(movie_id=movie_id)
         print(mov.json())
         # fetch movie from id and then show movie information and show option to book movie ticket
         return render(request, "main/movie.html", context={"movie": mov})
 
     def post(self, request, movie_id):
-        mov = get_movie(movie_id)
+        mov = Movie.objects.get(movie_id=movie_id)
         user = User.objects.get(uuid=request.COOKIES['user-identity'])
         ticket = Ticket.objects.create(
             user=user, )

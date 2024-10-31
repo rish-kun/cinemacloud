@@ -1,3 +1,4 @@
+import json
 from django.db import models
 import uuid
 import bcrypt
@@ -59,29 +60,73 @@ class Log(models.Model):
     pass
 
 
+class Transaction(models.Model):
+    time = models.DateTimeField(auto_now_add=True)
+    amount = models.IntegerField()
+    type = models.CharField(max_length=255, choices=[(
+        "add", "add"), ("withdraw", "withdraw"), ("refund", "refund"), ("ticket", "ticket"), ("food", "food")])
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp = models.IntegerField(default=gen_otp(), unique=False, editable=False)
+    id = models.UUIDField(default=uuid.uuid4, editable=False,
+                          unique=True, primary_key=True)
+
+
+class Theatre(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    seats = models.IntegerField(default=200)
+    shows = models.JSONField(null=True, default=None)
+
+
+class Movie(models.Model):
+    id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=255)
+    popularity = models.FloatField()
+    adult = models.BooleanField()
+    overview = models.TextField()
+    poster_path = models.CharField(max_length=255)
+    release_date = models.DateField()
+    vote_average = models.FloatField()
+    backdrop_path = models.CharField(max_length=255)
+    language = models.CharField(max_length=255)
+
+
+class Food(models.Model):
+    name = models.CharField(max_length=255)
+    price = models.IntegerField()
+    description = models.TextField()
+    image = models.CharField(max_length=255)
+
+
+class Show(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    theatre = models.ForeignKey(Theatre, on_delete=models.CASCADE)
+    time = models.DateTimeField()
+    price = models.IntegerField()
+
+
 class Ticket(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False,
                           unique=True, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     booked_date = models.DateTimeField(auto_now_add=True)
-    movie_date = models.DateTimeField()
     price = models.IntegerField(default=100)
-    used = models.BooleanField(default=False)
     transaction = models.ForeignKey(
-        'Transaction', on_delete=models.CASCADE, null=True)
+        Transaction, on_delete=models.CASCADE)
     food_orders = models.JSONField(default=None, null=True)
     cancelled = models.BooleanField(default=False)
-    movie = models.JSONField(default=None, null=True)
+    show = models.ForeignKey(Show, on_delete=models.CASCADE)
+    used = models.BooleanField(default=False)
+    tickets = models.IntegerField(default=1)
+
+    def add_order(self, food, quantity):
+        food = Food.objects.get(name=food)
+        orders = self.get_orders()
+        orders.append({food.name: quantity})
+        self.food_orders = json.dumps(dict(orders))
+        self.save()
+        return food
 
     def get_orders(self):
-        pass
-
-
-class Transaction(models.Model):
-    time = models.DateTimeField(auto_now_add=True)
-    amount = models.IntegerField()
-    # type = models.CharField(max_length=255, choices=[()])
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    otp = models.IntegerField(default=gen_otp(), unique=False, editable=False)
-    id = models.UUIDField(default=uuid.uuid4, editable=False,
-                          unique=True, primary_key=True)
+        return json.loads(self.food_orders)
