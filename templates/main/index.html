@@ -1,40 +1,60 @@
 {% extends "base.html" %}
 {% block body %}
-{% comment %} <h1>hi</h1> {% endcomment %}
+<nav class="flex items-center justify-between p-6 bg-gray-800 text-white">
+  <div class="flex items-center space-x-6">
+    <a href="#" class="text-xl font-bold">BrandName</a>
+    <a href="#" class="hover:text-gray-400">Menu 1</a>
+    <a href="#" class="hover:text-gray-400">Menu 2</a>
+    <a href="#" class="hover:text-gray-400">Menu 3</a>
+  </div>
+  <div>
+    <a href="#" class="hover:text-gray-400">
+      <!-- Settings icon -->
+      <span class="text-xl">⚙️</span>
+    </a>
+  </div>
+</nav>
 
 
-<div class="mx-6 my-5">
-    <h2>Available Movies</h2>
-    <ul>
+<div class="mx-6 my-5 ">
+<h2 class="text-3xl mx-7 font-bold">Available Movies</h2>
+
+
+<div class="mx-6 my-5  ">
+  <form action="{% url 'main:index' %}" method="GET" class="flex justify-start w-full">
+    <div class="relative w-full max-w-md">
+      <input type="text" name="query" placeholder="Search..." class="border border-gray-300 rounded-full pl-10 pr-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-gray-800" />
+      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M12.9 14.32a7 7 0 111.414-1.414l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387zM14 7a5 5 0 11-10 0 5 5 0 0110 0z" clip-rule="evenodd" />
+        </svg>
+      </div>
+    </div>
+  </form>
+</div>
+    <div class="grid grid-cols-3 ">
         {% for movie in movies %}
-        <!-- component -->
-        {% if forloop.counter0|divisibleby:3 %}
-        <div class="flex flex-wrap -mx-4">
-        {% endif %}
-        <div class="relative flex flex-col  my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-96">
-  <div class="relative h-56 m-2.5 overflow-hidden text-white rounded-md">
-    <img src="{{movie.poster_path}}" alt="card-image" />
-  </div>
-  <div class="p-4">
-    <h6 class="mb-2 text-slate-800 text-xl font-semibold">
-      {{movie.title}}
-    </h6>
-    <p class="text-slate-600 leading-normal font-light">
-      {{movie.overview}}
-    </p>
-  </div>
-  <div class="px-4 pb-4 pt-0 mt-2">
-    <button class="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
-      Read more
-    </button>
-  </div>
-</div>  
-        {% if forloop.counter0|divisibleby:3 %}
+        <div class="relative flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-96 h-max-7">
+        <div class="relative object-contain h-max-56 m-2.5 overflow-hidden text-white rounded-md">
+          <img src="{{movie.poster_path}}" alt="card-image" />
         </div>
-        {% endif %}
-
+        <div class="p-4">
+          <h6 class="mb-2 text-slate-800 text-xl font-semibold">
+            {{movie.title}}
+          </h6>
+          <p class="text-slate-600 leading-normal font-light">
+            {{movie.overview}}
+          </p>
+        </div>
+        <div class="px-4 pb-4 pt-0 mt-2">
+          <a class="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" href="{% url "main:movie" movie_id=movie.id %}">
+            Read more
+          </a>
+        </div>
+        </div>
         {% endfor %}
-    </ul>
+      </div>
+    {% comment %} </ul> {% endcomment %}
 </div>
 <div class="h-full p-6">
 <h1>{{user.name}}</h1>

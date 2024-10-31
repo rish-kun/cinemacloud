@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 import bcrypt
 from django.shortcuts import redirect
+from .utils import gen_otp
 
 
 class User(models.Model):
@@ -56,3 +57,31 @@ class Log(models.Model):
         'INFO', 'INFO'), ('ERROR', 'ERROR'), ('WARNING', 'WARNING')])
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     pass
+
+
+class Ticket(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False,
+                          unique=True, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    booked_date = models.DateTimeField(auto_now_add=True)
+    movie_date = models.DateTimeField()
+    price = models.IntegerField(default=100)
+    used = models.BooleanField(default=False)
+    transaction = models.ForeignKey(
+        'Transaction', on_delete=models.CASCADE, null=True)
+    food_orders = models.JSONField(default=None, null=True)
+    cancelled = models.BooleanField(default=False)
+    movie = models.JSONField(default=None, null=True)
+
+    def get_orders(self):
+        pass
+
+
+class Transaction(models.Model):
+    time = models.DateTimeField(auto_now_add=True)
+    amount = models.IntegerField()
+    # type = models.CharField(max_length=255, choices=[()])
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp = models.IntegerField(default=gen_otp(), unique=False, editable=False)
+    id = models.UUIDField(default=uuid.uuid4, editable=False,
+                          unique=True, primary_key=True)
