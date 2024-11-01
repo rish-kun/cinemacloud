@@ -78,10 +78,14 @@ class Theatre(models.Model):
     location = models.CharField(max_length=255)
     seats = models.IntegerField(default=200)
     shows = models.JSONField(null=True, default=None)
+    theatre_admin = models.ForeignKey(
+        TheatreAdmin, on_delete=models.CASCADE, null=True)
 
 
 class Movie(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4,
+                          editable=False, primary_key=True)
+    movie_id = models.IntegerField(null=True, unique=False)
     title = models.CharField(max_length=255)
     popularity = models.FloatField()
     adult = models.BooleanField()
@@ -91,6 +95,7 @@ class Movie(models.Model):
     vote_average = models.FloatField()
     backdrop_path = models.CharField(max_length=255)
     language = models.CharField(max_length=255)
+    genre = models.JSONField(default=None, null=True)
 
 
 class Food(models.Model):
@@ -101,6 +106,7 @@ class Food(models.Model):
 
 
 class Show(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     theatre = models.ForeignKey(Theatre, on_delete=models.CASCADE)
     time = models.DateTimeField()
@@ -122,6 +128,9 @@ class Ticket(models.Model):
     used = models.BooleanField(default=False)
     tickets = models.IntegerField(default=1)
 
+    def get_orders(self):
+        return json.loads(self.food_orders)
+
     def add_order(self, food, quantity):
         food = Food.objects.get(name=food)
         orders = self.get_orders()
@@ -129,6 +138,3 @@ class Ticket(models.Model):
         self.food_orders = json.dumps(dict(orders))
         self.save()
         return food
-
-    def get_orders(self):
-        return json.loads(self.food_orders)

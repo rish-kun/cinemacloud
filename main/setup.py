@@ -1,14 +1,17 @@
 # code for setting up default information
 from .api import get_movies
 from .models import Movie, Theatre, Show, Food
+import json
 
 
 def setup():
     mov_list = []
     # add movies
+
     for movie in get_movies():
+
         mov = Movie.objects.create(movie_id=movie.id, adult=movie.adult, backdrop_path=movie.backdrop_path, language=movie.language,
-                                   overview=movie.overview, popularity=movie.popularity, poster_path=movie.poster_path, release_date=movie.release_date, title=movie.title, vote_average=movie.vote_average)
+                                   overview=movie.overview, popularity=movie.popularity, poster_path=movie.poster_path, release_date=movie.release_date, title=movie.title, vote_average=movie.vote_average, genre=json.dumps(movie.genres))
         mov.save()
         mov_list.append(mov)
 
@@ -26,12 +29,12 @@ def setup():
 
     # add shows
     demo_shows = [
-        {'movie_id': mov_list[0], 'theatre': theatre_list[0],
-            'show_time': '2023-10-01 18:00:00'},
-        {'movie_id': mov_list[1], 'theatre_id': theatre_list[1],
-            'show_time': '2023-10-01 20:00:00'},
-        {'movie_id': mov_list[2], 'theatre_id': theatre_list[2],
-            'show_time': '2023-10-01 22:00:00'},
+        {'movie': mov_list[0], 'theatre': theatre_list[0],
+            'time': '2023-10-01 18:00:00', "price": 100},
+        {'movie': mov_list[1], 'theatre': theatre_list[1],
+            'time': '2023-10-01 20:00:00', "price": 300},
+        {'movie': mov_list[2], 'theatre': theatre_list[2],
+            'time': '2023-10-01 22:00:00', "price": 200},
     ]
 
     for show in demo_shows:
@@ -46,3 +49,7 @@ def setup():
 
     for food_item in demo_food_items:
         Food.objects.create(**food_item)
+
+
+if __name__ == '__main__':
+    setup()

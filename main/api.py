@@ -18,12 +18,32 @@ class Movie():
         self.vote_average = vote_average
         self.language = language
         self.backdrop_path = self.poster_base_url + backdrop_path
+        self.genres = self.get_genres(id)
 
     def __str__(self):
         return f"{self.title}"
 
     def json(self):
         return json.dumps(self.__dict__)
+
+    @staticmethod
+    def get_genres(movie_id):
+        dotenv.load_dotenv()
+
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}?language=en-US"
+        headers = {
+            "accept": "application/json",
+            "Authorization": f"Bearer {os.getenv("TMDB_API_READ_TOKEN")}"
+        }
+        response = requests.get(url, headers=headers)
+        # print(response.text)
+        data = json.loads(response.text)
+
+        genres = []
+        for genre in data["genres"]:
+            genres.append(genre["name"])
+
+        return genres
 
 
 def get_movies():
@@ -77,9 +97,14 @@ def get_movie(movie_id):
     response = requests.get(url, headers=headers)
     # print(response.text)
     data = json.loads(response.text)
+
+    genres = []
+    for genre in data["genres"]:
+        genres.append(genre["name"])
     mov = Movie(data["adult"], data["title"], data["overview"], data["poster_path"], data["release_date"],
                 data["vote_average"], data["popularity"], data["original_language"], data["backdrop_path"], data["id"])
     return mov
+
 
 #     # {
 #   "adult": false,

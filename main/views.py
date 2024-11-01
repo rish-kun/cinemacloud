@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import User, Ticket, Transaction, Movie
+from .models import User, Ticket, Show, Movie
 import bcrypt
+from .setup import setup
+from django.http import HttpResponse
 
 
 class IndexView(View):
@@ -10,10 +12,14 @@ class IndexView(View):
             request.COOKIES['user-identity']
         except KeyError:
             return redirect("main:login")
-        mov_list = Movie.objects.all()
-        for z in mov_list:
-            print(z.id)
-        return render(request, "main/index.html", context={"user": User.objects.get(uuid=request.COOKIES['user-identity']), "movies": mov_list})
+        try:
+            user = User.objects.get(uuid=request.COOKIES['user-identity']),
+        except User.DoesNotExist:
+            resp = redirect("main:login")
+            resp.delete_cookie('user-identity')
+            return resp
+        show_list = Show.objects.all()
+        return render(request, "main/index.html", context={"user": user, "shows": show_list})
 
 
 class LoginView(View):
@@ -76,3 +82,23 @@ class MovieView(View):
         ticket = Ticket.objects.create(
             user=user, )
         pass
+
+
+def setup_view(request):
+    setup()
+    return HttpResponse("Setup Done")
+
+
+class ShowView(View):
+    def get(self, request, show_id: str):
+        show = Show.objects.get(id=show_id)
+        return render(request, "main/book.html", context={"show": show})
+
+
+class BookView(View):
+    def get(self, request):
+        return HttpResponse("Nothing here")
+
+    def post(self, request):
+        n_t = request.POST['tickets']
+        return HttpResponse(n_t)
