@@ -118,7 +118,7 @@ class Ticket(models.Model):
                           unique=True, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     booked_date = models.DateTimeField(auto_now_add=True)
-    price = models.IntegerField(default=100)
+    price = models.BigIntegerField(default=100)
     transaction = models.ForeignKey(
         Transaction, on_delete=models.CASCADE, null=True)
     food_orders = models.JSONField(default=None, null=True)
@@ -126,7 +126,7 @@ class Ticket(models.Model):
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, null=True, default=None)
     used = models.BooleanField(default=False)
-    tickets = models.IntegerField(default=1)
+    seats = models.IntegerField(default=1)
 
     def get_orders(self):
         return json.loads(self.food_orders)

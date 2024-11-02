@@ -101,4 +101,9 @@ class BookView(View):
 
     def post(self, request):
         n_t = request.POST['tickets']
-        return HttpResponse(n_t)
+        show_id = request.POST['show_id']
+        show = Show.objects.get(id=show_id)
+        user = User.objects.get(uuid=request.COOKIES['user-identity'])
+        ticket = Ticket.objects.create(
+            user=user, show=show, price=int(n_t)*show.price, seats=n_t)
+        return render(request, "main/booked.html", context={"ticket": ticket})
