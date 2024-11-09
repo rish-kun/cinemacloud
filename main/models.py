@@ -4,6 +4,13 @@ import uuid
 import bcrypt
 from django.shortcuts import redirect
 from .utils import gen_otp
+from django.utils import timezone
+
+
+class Wallet(models.Model):
+    money = models.IntegerField(default=100)
+    user_id = models.UUIDField(default=None, null=True)
+    transaction_history = models.JSONField(null=True)
 
 
 class User(models.Model):
@@ -11,10 +18,15 @@ class User(models.Model):
     password = models.BinaryField(max_length=255)
     name = models.CharField(max_length=255)
     tickets = models.JSONField(default=None, null=True)
-    money = models.IntegerField(default=1000)
-    transaction_history = models.JSONField(default=None, null=True)
+    # money = models.IntegerField(default=1000)
+    # transaction_history = models.JSONField(default=None, null=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    wallet = models.ForeignKey(
+        Wallet, on_delete=models.CASCADE, default=None, null=True)
     email_verified = models.BooleanField(default=False)
+
+    def create_wallet(self):
+        self.wallet = Wallet.objects.create(user_id=self.uuid)
 
     def get_current_ticket(self):
         pass
@@ -46,10 +58,6 @@ class SuperAdmin(models.Model):
     pass
 
 
-class TheatreAdmin(models.Model):
-    pass
-
-
 # add logging later
 class Log(models.Model):
     info = models.CharField(max_length=1000)
@@ -58,6 +66,26 @@ class Log(models.Model):
         'INFO', 'INFO'), ('ERROR', 'ERROR'), ('WARNING', 'WARNING')])
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     pass
+
+
+class Theatre(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    seats = models.IntegerField(default=200)
+    shows = models.JSONField(null=True, default=None)
+
+
+class TheatreAdmin(models.Model):
+    username = models.CharField(max_length=256, null=True)
+    email = models.EmailField(unique=True, null=True)
+    password = models.BinaryField(max_length=255, null=True)
+    name = models.CharField(max_length=255, null=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    wallet = models.ForeignKey(
+        Wallet, on_delete=models.CASCADE, default=None, null=True)
+    theatre = models.ManyToManyField(
+        Theatre, related_name="admin")
 
 
 class Transaction(models.Model):
@@ -70,16 +98,8 @@ class Transaction(models.Model):
     otp = models.IntegerField(default=gen_otp(), unique=False, editable=False)
     id = models.UUIDField(default=uuid.uuid4, editable=False,
                           unique=True, primary_key=True)
-
-
-class Theatre(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    name = models.CharField(max_length=255)
-    location = models.CharField(max_length=255)
-    seats = models.IntegerField(default=200)
-    shows = models.JSONField(null=True, default=None)
-    theatre_admin = models.ForeignKey(
-        TheatreAdmin, on_delete=models.CASCADE, null=True)
+    to = models.ForeignKey(TheatreAdmin, on_delete=models.CASCADE, null=True)
+    # to should be a dict of the format {"user_type":["normal", 'theatreadmin']}
 
 
 class Movie(models.Model):
@@ -111,6 +131,25 @@ class Show(models.Model):
     theatre = models.ForeignKey(Theatre, on_delete=models.CASCADE)
     time = models.DateTimeField()
     price = models.IntegerField()
+    available_seats = models.IntegerField(default=100, null=False)
+    is_active = models.BooleanField(default=True)
+
+    def is_full(self):
+        return self.available_seats <= 0
+
+    def is_bookable(self):
+        return self.is_active and not self.is_full() and self.time > timezone.now()
+
+    def book_seats(self, num_seats):
+        if self.available_seats >= num_seats:
+            self.available_seats -= num_seats
+            self.save()
+            return True
+        return False
+
+    def release_seats(self, num_seats):
+        self.available_seats += num_seats
+        self.save()
 
 
 class Ticket(models.Model):
@@ -138,3 +177,58 @@ class Ticket(models.Model):
         self.food_orders = json.dumps(dict(orders))
         self.save()
         return food
+
+    def can_cancel(self):
+        return not self.cancelled and not self.used and self.show.time > timezone.now()
+
+    def cancel(self):
+        if not self.can_cancel():
+            return False
+
+        self.cancelled = True
+        self.show.release_seats(self.seats)
+
+        # Create refund transaction
+        refund = Transaction.objects.create(
+            user=self.user,
+            amount=self.price,
+            type="refund"
+        )
+        self.user.money += self.price
+        self.user.save()
+
+        # Refund food orders if any
+        if self.food_orders:
+            food_total = sum(order['price'] * order['quantity']
+                             for order in self.get_orders())
+            self.user.money += food_total
+            self.user.save()
+
+        self.save()
+        return True
+
+    def add_food_order(self, food_item, quantity):
+        if self.show.time <= timezone.now():
+            return False
+
+        if self.food_orders is None:
+            self.food_orders = []
+
+        order = {
+            'food_id': food_item.id,
+            'name': food_item.name,
+            'quantity': quantity,
+            'price': food_item.price
+        }
+
+        orders = self.get_orders()
+        orders.append(order)
+        self.food_orders = json.dumps(orders)
+        self.save()
+
+        # Deduct money from user
+        total = food_item.price * quantity
+        self.user.money -= total
+        self.user.save()
+
+        return True

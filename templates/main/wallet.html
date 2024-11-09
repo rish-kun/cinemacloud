@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+            <div id="add-msg" class="hidden max-w-md mx-auto mb-8 p-4 bg-green-100 text-green-700  rounded-lg">
+            Money was added to the wallet.
+            </div>
+            <div id="withdraw-msg" class="max-w-md mx-auto hidden mb-8 p-4 bg-red-100 text-red-700  rounded-lg">
+            Money was withdrawn from the wallet.
+            
+            </div>
+    <div class="max-w-md mx-auto">
+        <h2 class="text-center text-3xl font-extrabold text-gray-900 mb-8">
+            Current money in your wallet: {{user.wallet.money}}
+        </h2>
+        
+        <div class="space-y-4">
+            <!-- Withdraw Money Card -->
+            <div id="withdraw-card" class="bg-white overflow-hidden shadow-sm rounded-lg hover:shadow-md transition duration-300 cursor-pointer">
+                <div class="block p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900">Withdraw Money</h3>
+                            <p class="mt-1 text-sm text-gray-500">Transfer funds to your bank account</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Withdraw Form -->
+            <div id="withdraw-form" class="hidden">
+                <form class="bg-white shadow-md rounded-lg p-6 transition duration-300" method="POST" action="{% url "main:withdraw" %}">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="withdraw-amount">
+                            Amount to Withdraw
+                        </label>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="withdraw-amount" name="amount" type="number" placeholder="Enter amount">
+                    </div>
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="submit">
+                        Withdraw
+                    </button>
+                </form>
+            </div>
+
+            <!-- Add Money Card -->
+            <div id="add-card" class="bg-white overflow-hidden shadow-sm rounded-lg hover:shadow-md transition duration-300 cursor-pointer">
+                <div class="block p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900">Add Money</h3>
+                            <p class="mt-1 text-sm text-gray-500">Add funds to your account</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Money Form -->
+            <div id="add-form" class="hidden">
+                <form class="bg-white shadow-md rounded-lg p-6 transition duration-300" action="{% url "main:add" %}" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="add-amount">
+                            Amount to Add
+                        </label>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="add-amount" name="amount" type="number" placeholder="Enter amount">
+                    </div>
+                    <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="submit">
+                        Add Money
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const withdrawCard = document.getElementById('withdraw-card');
+    const withdrawForm = document.getElementById('withdraw-form');
+    const addCard = document.getElementById('add-card');
+    const addForm = document.getElementById('add-form');
+
+    withdrawCard.addEventListener('click', function() {
+        withdrawForm.classList.toggle('hidden');
+        addForm.classList.add('hidden');
+    });
+
+    addCard.addEventListener('click', function() {
+        addForm.classList.toggle('hidden');
+        withdrawForm.classList.add('hidden');
+    });
+
+    // Handle form submissions
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            /// e.preventDefault();
+            const amount = this.querySelector('input[type="number"]').value;
+            // Add your form submission logic here
+            console.log('Processing transaction:', amount);
+        });
+    });
+const url = window.location.href;
+const params = new URLSearchParams(window.location.search);
+const uVal = params.get('transaction');
+console.log(uVal==="withdraw")
+if (uVal === 'withdraw') {
+    const m = document.getElementById("withdraw-msg");
+    console.log(m);
+    m.style.display = "block";
+} 
+});
+
+const url = window.location.href;
+const params = new URLSearchParams(window.location.search);
+const uVal = params.get('transaction');
+console.log(uVal==="withdraw")
+if (uVal === 'withdraw') {
+    const m = document.getElementById("withdraw-msg");
+    m.style.display = "block";
+} else if (uVal === 'add') {
+    const m = document.getElementById("add-msg")
+    m.style.display = "block";
+    
+}
+const url2 = window.location.origin + window.location.pathname;
+window.history.replaceState({}, '', url2);
+
+</script>
+{% endblock %}

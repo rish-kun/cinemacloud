@@ -1,76 +1,81 @@
 {% extends "base.html" %}
 {% block body %}
-<nav class="flex items-center justify-between p-6 bg-gray-800 text-white">
-  <div class="flex items-center space-x-6">
-    <a href="#" class="text-xl font-bold">BrandName</a>
-    <a href="#" class="hover:text-gray-400">Menu 1</a>
-    <a href="#" class="hover:text-gray-400">Menu 2</a>
-    <a href="#" class="hover:text-gray-400">Menu 3</a>
+<!-- Modern Navbar -->
+<nav class=" top-0 z-50 flex items-center justify-between p-4 md:p-6 bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-lg backdrop-blur-sm bg-opacity-90">
+  <div class="flex items-center space-x-4 md:space-x-6">
+    <a href="#" class="text-xl font-bold hover:text-gray-200 transition-all transform hover:scale-105">
+      <span class="text-2xl">🎬</span> MovieCloud
+    </a>
+    <div class="hidden md:flex space-x-6">
+      <a href="#" class="hover:text-gray-200 transition-all border-b-2 border-transparent hover:border-gray-200 py-1">Movies</a>
+      <a href="#" class="hover:text-gray-200 transition-all border-b-2 border-transparent hover:border-gray-200 py-1">Theatres</a>
+      <a href="{% url 'main:wallet' %}" class="hover:text-gray-200 transition-all border-b-2 border-transparent hover:border-gray-200 py-1">Wallet</a>
+    </div>
   </div>
-  <div>
-    <a href="#" class="hover:text-gray-400">
-      <!-- Settings icon -->
-      <span class="text-xl">⚙️</span>
+  <div class="flex items-center space-x-6">
+    <div class="bg-white/20 px-4 py-2 rounded-full backdrop-blur-md">
+      <span class="text-sm md:text-base font-medium">💰 ${{user.wallet.money}}</span>
+    </div>
+    <a href="#" class="hover:text-gray-200 transition-all transform hover:scale-110">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+      </svg>
     </a>
   </div>
 </nav>
 
+<!-- Main Content -->
+<div class="container mx-auto px-4 py-8">
+  <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+    <h2 class="text-2xl md:text-3xl font-bold mb-4 md:mb-0">Available Movies</h2>
+    
+    <!-- Search Bar -->
+    <form action="{% url 'main:index' %}" method="GET" class="w-full md:w-96">
+      <div class="relative">
+        <input type="text" name="query" placeholder="Search movies..." 
+               class="w-full px-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-800 transition-all" />
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M12.9 14.32a7 7 0 111.414-1.414l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387zM14 7a5 5 0 11-10 0 5 5 0 0110 0z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+    </form>
+  </div>
 
-<div class="mx-6 my-5 ">
-<h2 class="text-3xl mx-7 font-bold">Available Movies</h2>
-
-
-<div class="mx-6 my-5  ">
-  <form action="{% url 'main:index' %}" method="GET" class="flex justify-start w-full">
-    <div class="relative w-full max-w-md">
-      <input type="text" name="query" placeholder="Search..." class="border border-gray-300 rounded-full pl-10 pr-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-gray-800" />
-      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-        <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M12.9 14.32a7 7 0 111.414-1.414l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387zM14 7a5 5 0 11-10 0 5 5 0 0110 0z" clip-rule="evenodd" />
-        </svg>
+  <!-- Movie Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for show in shows %}
+    <div class="flex flex-col bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <div class="relative aspect-[2/3] overflow-hidden rounded-t-xl">
+        <img src="{{show.movie.poster_path}}" alt="{{show.movie.title}}" 
+             class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" />
+      </div>
+      <div class="p-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">{{show.movie.title}}</h3>
+        <div class="flex items-center text-gray-600 mb-4">
+          <span class="text-sm">{{show.theatre.name}} | {{show.time}}</span>
+        </div>
+        <p class="text-gray-600 text-sm line-clamp-3 mb-4">{{show.movie.overview}}</p>
+        <a href="{% url 'main:show' show_id=show.id %}" 
+           class="inline-block w-full text-center bg-gray-800 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors duration-300">
+          Book Now
+        </a>
       </div>
     </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Logout Button -->
+<div class="fixed bottom-6 right-6">
+  <form action="{% url 'main:logout' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit" 
+            class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors duration-300 shadow-lg">
+      Logout
+    </button>
   </form>
 </div>
-    <div class="grid grid-cols-3 ">
-        {% for show in shows %}
-        <div class="relative flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-96 h-max-7">
-        <div class="relative object-contain h-max-56 m-2.5 overflow-hidden text-white rounded-md">
-          <img src="{{show.movie.poster_path}}" alt="card-image" />
-        </div>
-        <div class="p-4">
-          
-          <h6 class="mb-2 text-slate-800 text-xl font-semibold">
-            {{show.movie.title}}
-          </h6>
-          <h5 class="mb-2 text-slate-800 text-xl font-light ">
-              {{show.theatre.name}} | {{show.time}}
-          </h5>
-          <br>
-          <p class="text-slate-600 leading-normal font-light">
-            {{show.movie.overview}}
-          </p>
-        </div>
-        <div class="px-4 pb-4 pt-0 mt-2">
-          <a class="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" href="{% url "main:show" show_id=show.id %}">
-            Book
-          </a>
-        </div>
-        </div>
-        {% endfor %}
-      </div>
-    {% comment %} </ul> {% endcomment %}
-</div>
-<div class="h-full p-6">
-<h1>{{user.name}}</h1>
-{{user.email}}
-<br>    
-<form action= {% url "main:logout" %} method="POST" >
-    {% csrf_token %}
-<button type="Submit" class="btn btn-error text-white">Logout</button>
-</form>
-</div>
-
-
-
 {% endblock body %}
