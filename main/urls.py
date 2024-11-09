@@ -20,4 +20,5 @@ urlpatterns = [
     path("wallet", wallet, name="wallet"),
     path("withdraw", withdraw, name="withdraw"),
     path("add", add, name="add"),
+    path("404", not_found_404, name="404"),
 ]

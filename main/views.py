@@ -224,3 +224,7 @@ def add(request):
     user.wallet.money += amount
     user.wallet.save()
     return redirect("/wallet?transaction=add")
+
+
+def not_found_404(request):
+    return render(request, "404.html")

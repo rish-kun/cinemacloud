@@ -1,14 +1,46 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block body %}
-<div class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="text-center">
-        <h1 class="text-6xl font-bold text-gray-800">404</h1>
-        <p class="text-2xl text-gray-600 mt-4">Page Not Found</p>
-        <a href="{% url "main:index" %}" class="mt-6 inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Go Home</a>
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
+    <div class="max-w-2xl w-full text-center space-y-8">
+        <!-- SVG Illustration -->
+        <div class="w-full max-w-md mx-auto">
+            <svg class="w-32 h-32 mx-auto animate-float" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" stroke="#4B5563" stroke-width="2"/>
+            <path d="M9 9L15 15M15 9L9 15" stroke="#4B5563" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <!-- Text Content -->
+        <div class="space-y-6">
+            <h1 class="text-7xl md:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                404
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-600 font-light">
+                Oops! Looks like this page took a wrong turn.
+            </p>
+            <p class="text-gray-500">
+                The page you're looking for doesn't exist or has been moved.
+            </p>
+            <a href="{% url 'main:index' %}" 
+               class="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium transition-transform hover:scale-105 hover:shadow-lg">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Home
+            </a>
+        </div>
     </div>
 </div>
-{% comment %} <div class="mt-8">
-    <img src="" alt="Not Found" class="mx-auto w-1/2">
-</div> {% endcomment %}
+
+<style>
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+        100% { transform: translateY(0px); }
+    }
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+</style>
 {% endblock body %}
