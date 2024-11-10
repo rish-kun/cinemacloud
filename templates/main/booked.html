@@ -37,8 +37,13 @@
                 </div>
                 {% endif %}
                 
+                <a href="{% url 'main:tickets' %}" 
+                   class="mt-8 block w-full py-3 px-4 text-center text-white bg-emerald-600 hover:bg-emerald-700 rounded-full transition duration-200 font-semibold mb-4">
+                    View My Tickets
+                </a>
+                
                 <a href="{% url 'main:index' %}" 
-                   class="mt-8 block w-full py-3 px-4 text-center text-white bg-blue-600 hover:bg-blue-700 rounded-full transition duration-200 font-semibold">
+                   class="block w-full py-3 px-4 text-center text-white bg-blue-600 hover:bg-blue-700 rounded-full transition duration-200 font-semibold">
                     Back to Home
                 </a>
             </div>

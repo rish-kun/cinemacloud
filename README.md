@@ -6,8 +6,8 @@
 2. ~~Add otp for withdraw, add transactions.~~
 3. ~~Add more movies in setup~~
 4. ~~Don't show movies which are not bookable~~
-5. Make profile settings page
-6. Make page which shows tickets
+5. ~~Make profile settings page~~
+6. ~~Make page which shows tickets~~
 7. Implement google based login
 8. Add option for booking meals (make sure to use otp for that)
 9. Implement Search functionality
