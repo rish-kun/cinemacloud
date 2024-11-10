@@ -1,0 +1,61 @@
+{% extends "base2.html" %}
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for ticket in tickets %}
+        <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+            <div class="flex flex-row">
+                <!-- Ticket Content -->
+                <div class="p-4 flex-1">
+                    <div class="flex flex-wrap justify-between items-center mb-3">
+                        <!-- Status Badge -->
+                        <span class="px-3 py-1 text-sm font-medium rounded-full
+                            {% if ticket.cancelled == False %}bg-green-100 text-green-800
+                            {% elif ticket.cancelled == True %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ ticket.status|title }}
+                        </span>
+                        <span class="text-sm text-gray-500 mt-2 md:mt-0">#{{ ticket.show.movie.title }}</span>
+                    </div>
+
+                    <h2 class="text-xl font-bold text-gray-900 mb-2">{{ ticket.show.movie.title }}</h2>
+                    
+                    <!-- Theatre Location -->
+                    <div class="flex items-center text-gray-600 mb-2">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span>{{ ticket.show.theatre.name }} - {{ ticket.show.theatre.location }}</span>
+                    </div>
+
+                    <p class="text-gray-600 mb-3 line-clamp-2">{{ ticket.show.movie.overview }}</p>
+<br><br>
+                    <div class="flex flex-wrap items-center justify-between pt-3 border-t border-gray-100">
+                        <div class="flex items-center text-gray-500">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Booked: {{ ticket.booked_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="flex items-center text-gray-500 mt-2 md:mt-0">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span>Show: {{ ticket.show.time|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movie Image -->
+                <div class="w-1/3">
+                    <img src="{{ ticket.show.movie.poster_path }}" 
+                         alt="{{ ticket.show.movie.title }}" 
+                         class="w-full h-full object-cover object-center">
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock body %}

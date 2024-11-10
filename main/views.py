@@ -3,9 +3,8 @@ from .models import User, Ticket, Show, Movie, Food, Transaction, TheatreAdmin
 from django.views import View
 import bcrypt
 from .setup import setup
-from django.http import HttpResponse
-from django.http import JsonResponse
-
+from django.http import HttpResponse, JsonResponse, Http404
+from .utils import gen_otp
 # TODO: Add otp for all transactions
 # TODO: make transaction page into wallet page and change renders to redirect for add, withdraw transactions
 
@@ -22,7 +21,7 @@ class IndexView(View):
             resp = redirect("main:login")
             resp.delete_cookie('user-identity')
             return resp
-        show_list = Show.objects.all()
+        show_list = [x for x in Show.objects.all() if x.is_bookable()]
 
         return render(request, "main/index.html", context={"user": user, "shows": show_list[::-1]})
 
@@ -56,7 +55,7 @@ class SignupView(View):
         password = request.POST['password']
         name = request.POST['name']
         user = User.objects.create(email=email, password=bcrypt.hashpw(
-            bytes(password, 'utf-8'), bcrypt.gensalt()), name=name)
+            bytes(password, 'utf-8'), bcrypt.gensalt()), name=name.capitalize())
         user.create_wallet()
         user.save()
         resp = redirect("main:index")
@@ -120,45 +119,15 @@ class BookView(View):
         total_price = n_t * show.price
         if user.wallet.money < total_price:
             return render(request, "main/book.html", {"error": "Insufficient funds", "show": show})
-        # add otp verification mechanism
         th = TheatreAdmin.objects.first()
         transaction = Transaction(
-            amount=total_price, type="ticket", user=user, to=th)
+            amount=total_price, type="ticket", user=user, to=th, otp=gen_otp())
         # send otp
         print(transaction.otp)
         print(transaction.id)
         transaction.save()
         # return otp check page
-        return render(request, "main/transaction.html", context={"show": show, "user": user, "tickets": n_t, "transaction": transaction})
-
-
-class ConfirmTransactionView(View):
-    def post(self, request, transaction_id):
-        # get transaction from id
-        # confirm otp
-        # create booking, and show confirmation
-        # also get show id, ticketsfrom request.POST
-        user = User.objects.get(uuid=request.COOKIES['user-identity'])
-        transaction = Transaction.objects.get(id=str(transaction_id))
-        total_price = transaction.amount
-        tickets = request.POST['tickets']
-        otp = int(str(request.POST['otp-1']) + str(request.POST['otp-2']) + str(request.POST['otp-3']) +
-                  str(request.POST['otp-4']) +
-                  str(request.POST['otp-5']) + str(request.POST['otp-6']))
-        show = Show.objects.get(id=request.POST['show_id'])
-        if otp == transaction.otp:
-            user.wallet.money -= total_price
-            user.save()
-            user.wallet.save()
-            ticket = Ticket.objects.create(
-                user=user,
-                show=show,
-                price=total_price,
-                seats=tickets
-            )
-            return render(request, "main/booked.html", context={"ticket": ticket})
-        # make error handling better
-        return JsonResponse({"error": "Invalid OTP"}, status=400)
+        return render(request, "main/transaction.html", context={"show": show, "user": user, "tickets": n_t, "transaction": transaction, "redirect": "booking"})
 
 
 class CancelTicketView(View):
@@ -203,17 +172,79 @@ def wallet(request):
     return render(request, "main/wallet.html", context={"user": user})
 
 
+class ConfirmTransactionView(View):
+    def get(self, request, transaction_id):
+        raise Http404
+
+    def post(self, request, transaction_id):
+        # get transaction from id
+        # confirm otp
+        # create booking, and show confirmation
+        # also get show id, ticketsfrom request.POST
+        user = User.objects.get(uuid=request.COOKIES['user-identity'])
+        transaction = Transaction.objects.get(id=str(transaction_id))
+        total_price = transaction.amount
+        otp = int(str(request.POST['otp-1']) + str(request.POST['otp-2']) + str(request.POST['otp-3']) +
+                  str(request.POST['otp-4']) +
+                  str(request.POST['otp-5']) + str(request.POST['otp-6']))
+        redir = request.POST['redirect']
+        if redir == "booking":
+            if otp == transaction.otp:
+                tickets = request.POST['tickets']
+                show = Show.objects.get(id=request.POST['show_id'])
+                user.wallet.money -= total_price
+
+                ticket = Ticket.objects.create(
+                    user=user,
+                    show=show,
+                    price=total_price,
+                    seats=tickets
+                )
+                transaction.exceuted = True
+                user.bookings += 1
+                # user.add_ticket(ticket)
+                transaction.save()
+                ticket.save()
+                user.save()
+                user.wallet.save()
+                return render(request, "main/booked.html", context={"ticket": ticket})
+
+        elif redir == "withdraw":
+            if otp == transaction.otp:
+                user.wallet.money -= total_price
+                user.wallet.save()
+                transaction.exceuted = True
+                transaction.save()
+                return redirect("/wallet?transaction=withdraw")
+            return redirect("/wallet?wrong_otp=true")
+
+        elif redir == "add":
+            if otp == transaction.otp:
+                user.wallet.money += total_price
+                user.wallet.save()
+                transaction.exceuted = True
+                transaction.save()
+                return redirect("/wallet?transaction=add")
+            return redirect("/wallet?wrong_otp=true")
+        # make error handling better
+
+        return JsonResponse({"error": "Invalid OTP"}, status=400)
+
+
 def withdraw(request):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
     user = User.objects.get(uuid=request.COOKIES['user-identity'])
     amount = int(request.POST['amount'])
     if user.wallet.money < amount:
-        return JsonResponse({"error": "Insufficient funds"}, status=400)
-
-    user.wallet.money -= amount
-    user.wallet.save()
-    return redirect("/wallet?transaction=withdraw")
+        return render(request, "main/wallet.html", context={"error": "Insufficient funds", "user": user})
+    transaction = Transaction.objects.create(
+        user=user,
+        amount=amount,
+        type="withdraw", otp=gen_otp())
+    print(transaction.otp)
+    transaction.save()
+    return render(request, "main/transaction.html", context={"user": user, "transaction": transaction, "redirect": "withdraw"})
 
 
 def add(request):
@@ -221,10 +252,48 @@ def add(request):
         return JsonResponse({"error": "Method not allowed"}, status=405)
     user = User.objects.get(uuid=request.COOKIES['user-identity'])
     amount = int(request.POST['amount'])
-    user.wallet.money += amount
-    user.wallet.save()
-    return redirect("/wallet?transaction=add")
+    transaction = Transaction.objects.create(
+        user=user,
+        amount=amount,
+        type="add", otp=gen_otp())
+    print(transaction.otp)
+    transaction.save()
+    return render(request, "main/transaction.html", context={"user": user, "transaction": transaction, "redirect": "add"})
 
 
 def not_found_404(request):
     return render(request, "404.html")
+
+
+class AccountView(View):
+    def get(self, request):
+        try:
+            request.COOKIES['user-identity']
+        except KeyError:
+            return redirect("main:login")
+        try:
+            user = User.objects.get(uuid=request.COOKIES['user-identity'])
+        except User.DoesNotExist:
+            resp = redirect("main:login")
+            resp.delete_cookie('user-identity')
+            return resp
+        return render(request, "main/account.html", context={"user": user})
+
+
+class TicketView(View):
+    # def get(self, request):
+    #     return render(request, "404.html")
+
+    def get(self, request):
+        try:
+            request.COOKIES['user-identity']
+        except KeyError:
+            return redirect("main:login")
+        try:
+            user = User.objects.get(uuid=request.COOKIES['user-identity'])
+        except User.DoesNotExist:
+            resp = redirect("main:login")
+            resp.delete_cookie('user-identity')
+            return resp
+        tickets = Ticket.objects.filter(user=user)
+        return render(request, "main/tickets.html", context={"user": user, "tickets": tickets[::-1]})

@@ -177,3 +177,17 @@ def get_movie(movie_id):
 #   "vote_average": 7.3,
 #   "vote_count": 1046
 # }
+def main():
+    mov_list = []
+    for movie in get_movies():
+        mov_list.append(movie)
+        # mov = Movie(id=movie_id, adult=movie.adult, backdrop_path=movie.backdrop_path, language=movie.language,
+        #             overview=movie.overview, popularity=movie.popularity, poster_path=movie.poster_path, release_date=movie.release_date, title=movie.title, vote_average=movie.vote_average)
+        # mov.save()
+        # mov_list.append(mov)
+        print(movie)
+    print(len(mov_list))
+
+
+if __name__ == "__main__":
+    main()

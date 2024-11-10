@@ -3,8 +3,9 @@ from django.db import models
 import uuid
 import bcrypt
 from django.shortcuts import redirect
-from .utils import gen_otp
 from django.utils import timezone
+import random
+# from django.contrib.postgres.fields import ArrayField
 
 
 class Wallet(models.Model):
@@ -17,19 +18,39 @@ class User(models.Model):
     email = models.EmailField(unique=True)
     password = models.BinaryField(max_length=255)
     name = models.CharField(max_length=255)
-    tickets = models.JSONField(default=None, null=True)
+    tickets = models.JSONField(default=list, null=True)
+    # tickets = models.ArrayField(default=None, null=True)
+
+    creation_date = models.DateTimeField(
+        auto_now_add=True, null=True)
     # money = models.IntegerField(default=1000)
     # transaction_history = models.JSONField(default=None, null=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     wallet = models.ForeignKey(
         Wallet, on_delete=models.CASCADE, default=None, null=True)
     email_verified = models.BooleanField(default=False)
+    bookings = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.name} - {self.email}"
 
     def create_wallet(self):
+
         self.wallet = Wallet.objects.create(user_id=self.uuid)
 
     def get_current_ticket(self):
         pass
+
+    def add_ticket(self, ticket):
+        if self.tickets is not None:
+            t_s = json.loads(self.tickets)
+        else:
+            t_s = []
+        if t_s is None:
+            t_s = []
+        t_s.append(ticket.id)
+        self.tickets.append(ticket)
+        self.save()
 
     def authenticate(self, request):
         email = request.POST['email']
@@ -95,9 +116,11 @@ class Transaction(models.Model):
         "add", "add"), ("withdraw", "withdraw"), ("refund", "refund"), ("ticket", "ticket"), ("food", "food")], null=True)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, null=True)
-    otp = models.IntegerField(default=gen_otp(), unique=False, editable=False)
+    otp = models.IntegerField(default=random.randint(
+        100000, 999999), unique=False, editable=False)
     id = models.UUIDField(default=uuid.uuid4, editable=False,
                           unique=True, primary_key=True)
+    exceuted = models.BooleanField(default=False)
     to = models.ForeignKey(TheatreAdmin, on_delete=models.CASCADE, null=True)
     # to should be a dict of the format {"user_type":["normal", 'theatreadmin']}
 
@@ -166,6 +189,8 @@ class Ticket(models.Model):
         Show, on_delete=models.CASCADE, null=True, default=None)
     used = models.BooleanField(default=False)
     seats = models.IntegerField(default=1)
+    status = models.CharField(max_length=255, choices=[(
+        'booked', 'booked'), ('cancelled', 'cancelled'), ('used', 'used')], default='booked')
 
     def get_orders(self):
         return json.loads(self.food_orders)

@@ -1,14 +1,21 @@
-{% extends 'base.html' %}
+{% extends 'base2.html' %}
 {% block body %}
 
 <div class="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-            <div id="add-msg" class="hidden max-w-md mx-auto mb-8 p-4 bg-green-100 text-green-700  rounded-lg">
-            Money was added to the wallet.
-            </div>
-            <div id="withdraw-msg" class="max-w-md mx-auto hidden mb-8 p-4 bg-red-100 text-red-700  rounded-lg">
-            Money was withdrawn from the wallet.
-            
-            </div>
+    <div id="add-msg" class="hidden max-w-md mx-auto mb-8 p-4 bg-green-100 text-green-700  rounded-lg">
+        Money was added to the wallet.
+    </div>
+    <div id="withdraw-msg" class="max-w-md mx-auto hidden mb-8 p-4 bg-red-100 text-red-700  rounded-lg">
+        Money was withdrawn from the wallet.
+    </div>
+    <div id="wrong_otp" class="max-w-md mx-auto hidden mb-8 p-4 bg-red-100 text-red-700  rounded-lg">
+        The OTP you entered was wrong. Try again
+    </div>
+    {% if error %}
+    <div id="withdraw-msg" class="max-w-md mx-auto hidden mb-8 p-4 bg-red-100 text-red-700  rounded-lg">
+    {{error}}
+    </div>
+    {% endif %}
     <div class="max-w-md mx-auto">
         <h2 class="text-center text-3xl font-extrabold text-gray-900 mb-8">
             Current money in your wallet: {{user.wallet.money}}
@@ -40,7 +47,7 @@
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="withdraw-amount">
                             Amount to Withdraw
                         </label>
-                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="withdraw-amount" name="amount" type="number" placeholder="Enter amount">
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="withdraw-amount" name="amount" type="number" placeholder="Enter amount" required>
                     </div>
                     <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="submit">
                         Withdraw
@@ -73,7 +80,7 @@
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="add-amount">
                             Amount to Add
                         </label>
-                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="add-amount" name="amount" type="number" placeholder="Enter amount">
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="add-amount" name="amount" type="number" placeholder="Enter amount" required>
                     </div>
                     <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="submit">
                         Add Money
@@ -126,7 +133,6 @@ if (uVal === 'withdraw') {
 const url = window.location.href;
 const params = new URLSearchParams(window.location.search);
 const uVal = params.get('transaction');
-console.log(uVal==="withdraw")
 if (uVal === 'withdraw') {
     const m = document.getElementById("withdraw-msg");
     m.style.display = "block";
@@ -134,6 +140,11 @@ if (uVal === 'withdraw') {
     const m = document.getElementById("add-msg")
     m.style.display = "block";
     
+}
+const w_otp = params.get('wrong_otp');
+if (w_otp === 'true') {
+    const m = document.getElementById("wrong_otp")
+    m.style.display = "block";
 }
 const url2 = window.location.origin + window.location.pathname;
 window.history.replaceState({}, '', url2);

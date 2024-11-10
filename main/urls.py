@@ -21,4 +21,6 @@ urlpatterns = [
     path("withdraw", withdraw, name="withdraw"),
     path("add", add, name="add"),
     path("404", not_found_404, name="404"),
+    path("account", AccountView.as_view(), name="account"),
+    path("tickets", TicketView.as_view(), name="tickets"),
 ]
