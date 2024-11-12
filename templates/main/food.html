@@ -1,0 +1,104 @@
+{% extends 'base2.html' %}
+{% block body %}
+<div class="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        {% if error %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6" role="alert">
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-12">Food & Beverages</h1>
+        <form action="{% url "main:order_food" ticket.id %}" method="POST">
+            {% csrf_token %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for food in foods %}
+            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300">
+                <img src="{{ food.image }}" alt="{{ food.name }}" class="w-full h-56 object-cover">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-semibold text-gray-800">{{ food.name }}</h2>
+                        <span class="text-green-600 font-bold text-xl">₹{{ food.price }}</span>
+                    </div>
+                    <p class="text-gray-600 mb-6">{{ food.description }}</p>
+                    <div class="space-y-4">
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                            {{ food.id }}
+                        </span>
+                        <input type="hidden" id="show_id" name="show_id" value="{{ show.id }}">
+                        <div class="mt-4">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-2">Quantity</h2>
+                            <div class="inline-flex items-center border border-gray-300 rounded-full shadow-sm">
+                                <button type="button" class="px-4 py-2 text-gray-600 hover:bg-gray-50 transition rounded-l-full" onclick="decrementTickets({{food.food_id}})">-</button>
+                                <input type="number" id="qty-{{food.food_id}}" name="qty-{{food.food_id}}" class="w-20 text-center border-x border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="0" min="0" max="10">
+                                <button type="button" class="px-4 py-2 text-gray-600 hover:bg-gray-50 transition rounded-r-full" onclick="incrementTickets({{food.food_id}})">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg p-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="text-xl font-semibold text-gray-800">
+                Total Cost: <span id="totalCost" class="text-green-600">₹0</span>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                Proceed to Payment
+            </button>
+        </div>
+    </div>
+    </form>
+    </div>
+</div>
+
+<script>
+    function calculateTotalCost() {
+        let total = 0;
+        const inputs = document.querySelectorAll('input[id^="qty-"]');
+        
+        inputs.forEach(input => {
+            const foodId = input.id.split('-')[1];
+            const quantity = parseInt(input.value);
+            const priceElement = input.closest('.bg-white').querySelector('.text-green-600');
+            const price = parseInt(priceElement.textContent.replace('₹', ''));
+            total += quantity * price;
+        });
+
+        document.getElementById('totalCost').textContent = '₹' + total;
+    }
+
+    // Add event listeners to quantity inputs
+    document.querySelectorAll('input[id^="qty-"]').forEach(input => {
+        input.addEventListener('change', calculateTotalCost);
+    });
+
+    // Update total when using increment/decrement buttons
+    const originalIncrement = incrementTickets;
+    incrementTickets = function(count) {
+        originalIncrement(count);
+        calculateTotalCost();
+    };
+
+    const originalDecrement = decrementTickets;
+    decrementTickets = function(count) {
+        originalDecrement(count);
+        calculateTotalCost();
+    };
+
+    function incrementTickets(count) {
+        const input = document.getElementById(`qty-${count}`);
+        if (input.value < 10) {
+            input.value = parseInt(input.value) + 1;
+        }
+    }
+
+    function decrementTickets(count) {
+        const input = document.getElementById(`qty-${count}`);
+        if (input.value > 0) {
+            input.value = parseInt(input.value) - 1;
+        }
+    }
+</script>
+
+{% endblock %}

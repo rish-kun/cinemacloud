@@ -1,0 +1,133 @@
+{% extends 'base2.html' %}
+{% block body %}
+<div class="container mx-auto px-4 py-8 max-w-5xl">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+        <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+        </svg>
+        Ticket Details
+    </h2>
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+        <div class="p-8 flex flex-col md:flex-row">
+            <div class="flex-1">
+                <h4 class="text-3xl font-bold text-gray-800 mb-6">{{ ticket.show.movie.title }}</h4>
+                <hr class="my-6 border-gray-200">
+                
+                <div class="space-y-4">
+                    <p class="text-gray-700 flex items-center text-lg">
+                        <svg class="w-5 h-5 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                        <span class="font-semibold mr-2">Theatre:</span> {{ ticket.show.theatre.name }}
+                    </p>
+                    <p class="text-gray-700 flex items-center text-lg">
+                        <svg class="w-5 h-5 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+                        </svg>
+                        <span class="font-semibold mr-2">Screen:</span> {{ ticket.show.screen.name }}
+                    </p>
+                    <p class="text-gray-700 flex items-center text-lg">
+                        <svg class="w-5 h-5 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="font-semibold mr-2">Date & Time:</span> {{ ticket.show.date }} {{ ticket.show.time }}
+                    </p>
+                    <p class="text-gray-700 flex items-center text-lg">
+                        <svg class="w-5 h-5 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span class="font-semibold mr-2">Seat:</span> {{ ticket.seat_number }}
+                    </p>
+                </div>
+                
+                {% if food_orders %}
+                    <div class="mt-8 bg-gray-50 rounded-lg p-4">
+                        <h5 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                            <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                            </svg>
+                            Food Orders
+                        </h5>
+                        <ul class="divide-y divide-gray-200">
+                        {% for food, qty in food_orders.items %}
+                            <li class="py-3 flex justify-between items-center hover:bg-gray-100 rounded-lg px-2">
+                                <span class="text-gray-700 flex items-center">
+                                    <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                                    {{ food.name }}
+                                </span>
+                                <span class="text-gray-600">x{{ qty }}</span>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="mt-8 bg-gray-50 rounded-lg p-6">
+                    <div class="space-y-3">
+                        <p class="flex justify-between items-center text-lg">
+                            <span class="text-gray-600">Ticket Amount</span>
+                            <span class="font-mono font-semibold">₹{{ ticket.price|floatformat:2 }}</span>
+                        </p>
+                        <p class="flex justify-between items-center text-lg">
+                            <span class="text-gray-600">Food Amount</span>
+                            <span class="font-mono font-semibold">₹{{ ticket.food_order_price|floatformat:2 }}</span>
+                        </p>
+                        <div class="border-t border-gray-200 pt-3">
+                            <p class="flex justify-between items-center text-xl font-bold">
+                                <span class="text-gray-800">Total</span>
+                                <span class="text-indigo-600">₹{{ ticket.price|add:ticket.food_order_price|floatformat:2 }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            <div class="flex flex-col flex-grow justify-between">
+                <div class="mt-8 p-4 bg-gray-50 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+                    <h5 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                        Add Movie Snacks
+                    </h5>
+                    <p class="text-sm text-gray-600 mb-4">Enhance your movie experience with delicious snacks and beverages!</p>
+                    <a href="{% url 'main:order_food' ticket.id %}" 
+                    class="group flex items-center justify-center w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300">
+                        <svg class="w-5 h-5 mr-2 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+                        </svg>
+                        Book Meals
+                        <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            </div>
+            
+           <div class="md:ml-8 mt-6 md:mt-0 md:w-72">
+            <img src="{{ ticket.show.movie.poster_path }}" alt="{{ ticket.show.movie.title }}" 
+                class="rounded-lg shadow-md w-full h-auto object-cover transform hover:scale-105 transition-transform duration-300">
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                <h5 class="text-lg font-semibold text-gray-800 mb-2">Movie Overview</h5>
+                <p class="text-gray-600 text-sm">{{ ticket.show.movie.overview }}</p>
+            </div>
+            </div>
+
+
+        </div>
+         <div class="flex justify-end p-4 bg-gray-50">
+            
+            <a href="{% url 'main:index' %}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Home
+            </a>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

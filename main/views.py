@@ -6,8 +6,6 @@ from .setup import setup
 from django.http import HttpResponse, JsonResponse, Http404
 from .utils import gen_otp
 from .mail import send_email, email_body
-# TODO: Add otp for all transactions
-# TODO: make transaction page into wallet page and change renders to redirect for add, withdraw transactions
 
 
 class IndexView(View):
@@ -115,7 +113,7 @@ class BookView(View):
             otp=int(transaction.otp)), [user.email])
         transaction.save()
         # return otp check page
-        return render(request, "main/transaction.html", context={"show": show, "user": user, "tickets": n_t, "transaction": transaction, "redirect": "booking"})
+        return render(request, "main/transaction_verify.html", context={"show": show, "user": user, "tickets": n_t, "transaction": transaction, "redirect": "booking"})
 
 
 class CancelTicketView(View):
@@ -129,26 +127,6 @@ class CancelTicketView(View):
         return JsonResponse({"error": "Cannot cancel ticket"}, status=400)
 
 
-class FoodOrderView(View):
-    def post(self, request, ticket_id):
-        ticket = Ticket.objects.get(id=ticket_id)
-        if ticket.user.uuid != request.COOKIES['user-identity']:
-            return JsonResponse({"error": "Unauthorized"}, status=403)
-
-        food_id = request.POST['food_id']
-        quantity = int(request.POST['quantity'])
-
-        food_item = Food.objects.get(id=food_id)
-        total_cost = food_item.price * quantity
-
-        if ticket.user.wallet.money < total_cost:
-            return JsonResponse({"error": "Insufficient funds"}, status=400)
-
-        if ticket.add_food_order(food_item, quantity):
-            return JsonResponse({"message": "Food order added successfully"})
-        return JsonResponse({"error": "Cannot add food order"}, status=400)
-
-
 def wallet(request):
     try:
         user = User.objects.get(uuid=request.COOKIES['user-identity'])
@@ -157,7 +135,7 @@ def wallet(request):
         resp.delete_cookie('user-identity')
         return resp
 
-    return render(request, "main/wallet.html", context={"user": user})
+    return render(request, "main/wallet.html", context={"user": user, "transactions": user.get_transactions()[::-1]})
 
 
 class ConfirmTransactionView(View):
@@ -165,10 +143,8 @@ class ConfirmTransactionView(View):
         raise Http404
 
     def post(self, request, transaction_id):
-        # get transaction from id
-        # confirm otp
-        # create booking, and show confirmation
-        # also get show id, ticketsfrom request.POST
+        """get transaction from id
+         confirm otp"""
         user = User.objects.get(uuid=request.COOKIES['user-identity'])
         transaction = Transaction.objects.get(id=str(transaction_id))
         total_price = transaction.amount
@@ -214,7 +190,19 @@ class ConfirmTransactionView(View):
                 transaction.save()
                 return redirect("/wallet?transaction=add")
             return redirect("/wallet?wrong_otp=true")
-        # make error handling better
+
+        elif redir == "food":
+            if otp == transaction.otp:
+                ticket_id = request.POST['ticket_id']
+                ticket = Ticket.objects.get(id=ticket_id)
+                ticket.food_order_confirmed = True
+                ticket.food_order_price = transaction.amount
+                ticket.save()
+                user.wallet.money -= total_price
+                user.wallet.save()
+                transaction.exceuted = True
+                transaction.save()
+                return redirect(f"/ticket/{ticket_id}?meal_confirm=true")
 
         return JsonResponse({"error": "Invalid OTP"}, status=400)
 
@@ -234,7 +222,7 @@ def withdraw(request):
     send_email("OTP for CinemaCloud", email_body.format(
         otp=int(transaction.otp)), [user.email])
     transaction.save()
-    return render(request, "main/transaction.html", context={"user": user, "transaction": transaction, "redirect": "withdraw"})
+    return render(request, "main/transaction_verify.html", context={"user": user, "transaction": transaction, "redirect": "withdraw"})
 
 
 def add(request):
@@ -250,7 +238,7 @@ def add(request):
     send_email("OTP for CinemaCloud", email_body.format(
         otp=int(transaction.otp)), [user.email])
     transaction.save()
-    return render(request, "main/transaction.html", context={"user": user, "transaction": transaction, "redirect": "add"})
+    return render(request, "main/transaction_verify.html", context={"user": user, "transaction": transaction, "redirect": "add"})
 
 
 def not_found_404(request):
@@ -273,9 +261,6 @@ class AccountView(View):
 
 
 class TicketView(View):
-    # def get(self, request):
-    #     return render(request, "404.html")
-
     def get(self, request):
         try:
             request.COOKIES['user-identity']
@@ -300,3 +285,56 @@ def shows(request, movie_id):
     movie = Movie.objects.get(id=movie_id)
     shows = Show.objects.filter(movie=movie)
     return render(request, "main/index.html", context={"shows": shows[::-1], "movie_name": movie.title})
+
+
+class FoodOrderView(View):
+
+    def get(self, request, ticket_id):
+        ticket = Ticket.objects.get(id=ticket_id)
+        print(Food.objects.all())
+        return render(request, "main/food.html", context={"foods": Food.objects.all(), "user": ticket.user, "ticket": ticket})
+
+    def post(self, request, ticket_id):
+        ticket = Ticket.objects.get(id=ticket_id)
+        print(request.COOKIES['user-identity'])
+        print(ticket.user.uuid)
+        if str(ticket.user.uuid) != request.COOKIES['user-identity']:
+            return JsonResponse({"error": "Unauthorized"}, status=403)
+        order_list = {}
+        total_price = 0
+        for food in Food.objects.all():
+            print(food.name)
+            food_qty = int(request.POST[f'qty-{food.food_id}'])
+            if food_qty != 0:
+                ticket.add_order(food.id, food_qty)
+                order_list[food.food_id] = food_qty
+            total_price += food.price * food_qty
+        if total_price > ticket.user.wallet.money:
+            return render(request, "main/food.html", context={"error": "Insufficient funds", "foods": Food.objects.all(), "user": ticket.user, "ticket": ticket})
+        transaction = Transaction(
+            amount=total_price, type="food", user=ticket.user, otp=gen_otp())
+        send_email("OTP for CinemaCloud", email_body.format(
+            otp=int(transaction.otp)), [ticket.user.email])
+        print(transaction.otp)
+        print(transaction.id)
+        transaction.save()
+
+        return render(request, "main/transaction_verify.html", context={"user": ticket.user, "transaction": transaction, "redirect": "food", "ticket": ticket})
+
+
+def ticket(request, ticket_id):
+    ticket = Ticket.objects.get(id=ticket_id)
+    print("here")
+    return render(request, "main/ticket.html", context={"ticket": ticket, "user": ticket.user, "food_orders": ticket.get_orders()})
+
+
+def transactions(request):
+    user = User.objects.get(uuid=request.COOKIES['user-identity'])
+    transactions = Transaction.objects.filter(user=user)
+    return render(request, "main/transactions.html", context={"transactions": transactions[::-1], "user": user})
+
+
+def transaction(request, transaction_id):
+    user = User.objects.get(uuid=request.COOKIES['user-identity'])
+    transaction = Transaction.objects.get(id=transaction_id)
+    return render(request, "main/transaction.html", context={"transaction": transaction, "user": user})

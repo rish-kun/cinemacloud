@@ -24,4 +24,7 @@ urlpatterns = [
     path("tickets", TicketView.as_view(), name="tickets"),
     path("movies", movies, name="movies"),
     path("shows/<uuid:movie_id>", shows, name="shows"),
+    path("ticket/<uuid:ticket_id>", ticket, name="ticket"),
+    path("transaction/<uuid:transaction_id>", transaction, name="transaction"),
+    path("transactions", transactions, name="transactions"),
 ]

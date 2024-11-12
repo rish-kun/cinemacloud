@@ -10,7 +10,7 @@
 6. ~~Make page which shows tickets~~
 7. Implement google based login
 8. ~~Make page for showing the shows of a particular movie~~
-9. Add option for booking meals (make sure to use otp for that)
+9. ~~Add option for booking meals (make sure to use otp for that)~~
 10. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.
 11. Implement Search functionality
 12. Show all previous transactions of the user (show theatre name in the "to" for the transaction)
@@ -23,4 +23,5 @@
 19. Make seat booking provisions
 20. Movie cast, trailer link
 21. Add location
-22. Add nginx
+22. Add titles for all html pages
+23. Add nginx

@@ -18,7 +18,7 @@
                         {% comment %} <span class="text-sm text-gray-500 mt-2 md:mt-0">#{{ ticket.show.movie.title }}</span> {% endcomment %}
                     </div>
 
-                    <h2 class="text-xl font-bold text-gray-900 mb-2">{{ ticket.show.movie.title }}</h2>
+                    <h2 class="text-xl font-bold text-gray-900 mb-2"><a href="{% url "main:ticket" ticket.id %}">{{ ticket.show.movie.title }}</h2></a>
                     
                     <!-- Theatre Location -->
                     <div class="flex items-center text-gray-600 mb-2">

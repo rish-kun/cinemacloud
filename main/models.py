@@ -59,6 +59,10 @@ class User(models.Model):
             user = User.objects.get(email=email)
             return user
 
+    def get_transactions(self):
+        transactions = Transaction.objects.filter(user=self)
+        return transactions
+
     @staticmethod
     def get_user(request, path):
         try:
@@ -142,10 +146,15 @@ class Movie(models.Model):
 
 
 class Food(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     name = models.CharField(max_length=255)
     price = models.IntegerField()
     description = models.TextField()
     image = models.CharField(max_length=255)
+    food_id = models.BigIntegerField(null=True, unique=True, default=None)
+
+    def __str__(self):
+        return self.name
 
 
 class Show(models.Model):
@@ -183,7 +192,8 @@ class Ticket(models.Model):
     price = models.BigIntegerField(default=100)
     transaction = models.ForeignKey(
         Transaction, on_delete=models.CASCADE, null=True)
-    food_orders = models.JSONField(default=None, null=True)
+    food_orders = models.JSONField(
+        default=None, null=True)  # ? format: {Food_item: quantity}
     cancelled = models.BooleanField(default=False)
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, null=True, default=None)
@@ -191,17 +201,30 @@ class Ticket(models.Model):
     seats = models.IntegerField(default=1)
     status = models.CharField(max_length=255, choices=[(
         'booked', 'booked'), ('cancelled', 'cancelled'), ('used', 'used')], default='booked')
+    food_order_confirmed = models.BooleanField(default=False)
+    food_order_price = models.IntegerField(default=0)
 
     def get_orders(self):
-        return json.loads(self.food_orders)
+        if self.food_orders is not None and self.food_orders != "" and len(self.food_orders) != 0:
+            orders = json.loads(self.food_orders)
+        else:
+            orders = {}
+        o_l = {}
+        for food_id in orders:
+            food = Food.objects.get(food_id=food_id)
+            o_l[food] = orders[food_id]
+        return o_l
 
-    def add_order(self, food, quantity):
-        food = Food.objects.get(name=food)
-        orders = self.get_orders()
-        orders.append({food.name: quantity})
-        self.food_orders = json.dumps(dict(orders))
+    def add_order(self, food_id: uuid.UUID, quantity: int):
+        food = Food.objects.get(id=food_id)
+        if self.food_orders is not None and self.food_orders != "" and len(self.food_orders) != 0:
+            orders = json.loads(self.food_orders)
+        else:
+            orders = {}
+        orders.update({food.food_id: quantity})
+        self.food_orders = json.dumps(orders)
         self.save()
-        return food
+        return True
 
     def can_cancel(self):
         return not self.cancelled and not self.used and self.show.time > timezone.now()
@@ -230,30 +253,4 @@ class Ticket(models.Model):
             self.user.save()
 
         self.save()
-        return True
-
-    def add_food_order(self, food_item, quantity):
-        if self.show.time <= timezone.now():
-            return False
-
-        if self.food_orders is None:
-            self.food_orders = []
-
-        order = {
-            'food_id': food_item.id,
-            'name': food_item.name,
-            'quantity': quantity,
-            'price': food_item.price
-        }
-
-        orders = self.get_orders()
-        orders.append(order)
-        self.food_orders = json.dumps(orders)
-        self.save()
-
-        # Deduct money from user
-        total = food_item.price * quantity
-        self.user.money -= total
-        self.user.save()
-
         return True
