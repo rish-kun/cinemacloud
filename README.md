@@ -9,12 +9,18 @@
 5. ~~Make profile settings page~~
 6. ~~Make page which shows tickets~~
 7. Implement google based login
-8. Add option for booking meals (make sure to use otp for that)
-9. Implement Search functionality
-10. Show all previous transactions of the user (show theatre name in the "to" for the transaction)
-11. Implement theatre admin features
-12. Enable Email notifications.
-13. Make email verfication system, password change system.
-14. Implement discount system if time is there
-15. Convert application in docker
-16. Add nginx
+8. ~~Make page for showing the shows of a particular movie~~
+9. Add option for booking meals (make sure to use otp for that)
+10. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.
+11. Implement Search functionality
+12. Show all previous transactions of the user (show theatre name in the "to" for the transaction)
+13. Implement theatre admin features
+14. ~~Enable Email notifications.~~
+15. Make email verfication system, password change system.
+16. Check if the seat count decreases for a show when a ticket is booked.
+17. Implement discount system if time is there
+18. Convert application in docker
+19. Make seat booking provisions
+20. Movie cast, trailer link
+21. Add location
+22. Add nginx

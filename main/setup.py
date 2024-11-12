@@ -77,6 +77,24 @@ def setup():
             'time': '2024-11-21 21:30:00', "price": 260},
         {'movie': mov_list[19], 'theatre': theatre_list[1],
          'time': '2024-11-21 21:30:00', "price": 260},
+        {'movie': mov_list[0], 'theatre': theatre_list[3],
+            'time': '2024-11-22 17:00:00', "price": 150},
+        {'movie': mov_list[1], 'theatre': theatre_list[4],
+            'time': '2024-11-22 19:30:00', "price": 280},
+        {'movie': mov_list[2], 'theatre': theatre_list[5],
+            'time': '2024-11-23 18:00:00', "price": 220},
+        {'movie': mov_list[3], 'theatre': theatre_list[6],
+            'time': '2024-11-23 20:30:00', "price": 190},
+        {'movie': mov_list[4], 'theatre': theatre_list[7],
+            'time': '2024-11-24 16:30:00', "price": 250},
+        {'movie': mov_list[5], 'theatre': theatre_list[8],
+            'time': '2024-11-24 19:00:00', "price": 230},
+        {'movie': mov_list[6], 'theatre': theatre_list[9],
+            'time': '2024-11-25 17:30:00', "price": 200},
+        {'movie': mov_list[7], 'theatre': theatre_list[10],
+            'time': '2024-11-25 20:00:00', "price": 270},
+        {'movie': mov_list[8], 'theatre': theatre_list[11],
+            'time': '2024-11-26 18:30:00', "price": 240}
     ]
 
     for show in demo_shows:

@@ -63,5 +63,14 @@
         </div>
     </div>
 </div>
-
+<!-- Logout Button -->
+<div class="fixed bottom-6 right-6">
+  <form action="{% url 'main:logout' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit" 
+            class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors duration-300 shadow-lg">
+      Logout
+    </button>
+  </form>
+</div>
 {% endblock %}

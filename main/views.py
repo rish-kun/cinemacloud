@@ -5,6 +5,7 @@ import bcrypt
 from .setup import setup
 from django.http import HttpResponse, JsonResponse, Http404
 from .utils import gen_otp
+from .mail import send_email, email_body
 # TODO: Add otp for all transactions
 # TODO: make transaction page into wallet page and change renders to redirect for add, withdraw transactions
 
@@ -60,7 +61,8 @@ class SignupView(View):
         user.save()
         resp = redirect("main:index")
         resp.set_cookie('user-identity', user.uuid)
-        # send_email
+        #
+
         return resp
 
 
@@ -72,21 +74,6 @@ class LogoutView(View):
         resp = redirect("main:login")
         resp.delete_cookie('user-identity')
         return resp
-
-
-class MovieView(View):
-    def get(self, request, movie_id):
-        mov = Movie.objects.get(movie_id=movie_id)
-        print(mov.json())
-        # fetch movie from id and then show movie information and show option to book movie ticket
-        return render(request, "main/movie.html", context={"movie": mov})
-
-    def post(self, request, movie_id):
-        mov = Movie.objects.get(movie_id=movie_id)
-        user = User.objects.get(uuid=request.COOKIES['user-identity'])
-        ticket = Ticket.objects.create(
-            user=user, )
-        pass
 
 
 def setup_view(request):
@@ -124,7 +111,8 @@ class BookView(View):
             amount=total_price, type="ticket", user=user, to=th, otp=gen_otp())
         # send otp
         print(transaction.otp)
-        print(transaction.id)
+        send_email("OTP for CinemaCloud", email_body.format(
+            otp=int(transaction.otp)), [user.email])
         transaction.save()
         # return otp check page
         return render(request, "main/transaction.html", context={"show": show, "user": user, "tickets": n_t, "transaction": transaction, "redirect": "booking"})
@@ -243,6 +231,8 @@ def withdraw(request):
         amount=amount,
         type="withdraw", otp=gen_otp())
     print(transaction.otp)
+    send_email("OTP for CinemaCloud", email_body.format(
+        otp=int(transaction.otp)), [user.email])
     transaction.save()
     return render(request, "main/transaction.html", context={"user": user, "transaction": transaction, "redirect": "withdraw"})
 
@@ -257,6 +247,8 @@ def add(request):
         amount=amount,
         type="add", otp=gen_otp())
     print(transaction.otp)
+    send_email("OTP for CinemaCloud", email_body.format(
+        otp=int(transaction.otp)), [user.email])
     transaction.save()
     return render(request, "main/transaction.html", context={"user": user, "transaction": transaction, "redirect": "add"})
 
@@ -297,3 +289,14 @@ class TicketView(View):
             return resp
         tickets = Ticket.objects.filter(user=user)
         return render(request, "main/tickets.html", context={"user": user, "tickets": tickets[::-1]})
+
+
+def movies(request):
+    movies = Movie.objects.all()
+    return render(request, "main/movies.html", context={"movies": movies})
+
+
+def shows(request, movie_id):
+    movie = Movie.objects.get(id=movie_id)
+    shows = Show.objects.filter(movie=movie)
+    return render(request, "main/index.html", context={"shows": shows[::-1], "movie_name": movie.title})

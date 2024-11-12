@@ -7,7 +7,6 @@ urlpatterns = [
     path("login", LoginView.as_view(), name="login"),
     path("signup", SignupView.as_view(), name="signup"),
     path("logout", LogoutView.as_view(), name="logout"),
-    path("movie/<str:movie_id>", MovieView.as_view(), name="movie"),
     path("setup", setup_view, name="setup"),
     path("show/<str:show_id>", ShowView.as_view(), name="show"),
     path("book/", BookView.as_view(), name="book"),
@@ -23,4 +22,6 @@ urlpatterns = [
     path("404", not_found_404, name="404"),
     path("account", AccountView.as_view(), name="account"),
     path("tickets", TicketView.as_view(), name="tickets"),
+    path("movies", movies, name="movies"),
+    path("shows/<uuid:movie_id>", shows, name="shows"),
 ]
