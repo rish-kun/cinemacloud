@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, redirect
 from .models import User, Ticket, Show, Movie, Food, Transaction, TheatreAdmin
 from django.views import View
@@ -6,6 +7,10 @@ from .setup import setup
 from django.http import HttpResponse, JsonResponse, Http404
 from .utils import gen_otp
 from .mail import send_email, email_body
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from django.views.decorators.csrf import csrf_exempt
+
 # TODO: Add otp for all transactions
 # TODO: make transaction page into wallet page and change renders to redirect for add, withdraw transactions
 
@@ -300,3 +305,17 @@ def shows(request, movie_id):
     movie = Movie.objects.get(id=movie_id)
     shows = Show.objects.filter(movie=movie)
     return render(request, "main/index.html", context={"shows": shows[::-1], "movie_name": movie.title})
+
+
+@csrf_exempt
+def auth_receiver(request):
+
+    # token = request.POST['credential']
+    # try:
+    #     user_data = id_token.verify_oauth2_token(
+    #         token, requests. Request), os.environ['GOOGLE_OAUTH_CLIENT_ID']
+    # except ValueError:
+    #     return HttpResponse(status=403)
+    # print(user_data)
+    # request.session['user_data'] = user_data
+    return render(request, "main/google.html")

@@ -24,4 +24,5 @@ urlpatterns = [
     path("tickets", TicketView.as_view(), name="tickets"),
     path("movies", movies, name="movies"),
     path("shows/<uuid:movie_id>", shows, name="shows"),
+    path("google/auth", auth_receiver, name="google_auth")
 ]

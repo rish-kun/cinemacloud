@@ -80,8 +80,11 @@
                     </div>
                 </div>
 
+                
                 <div class="mt-6">
-                    <button class="w-full flex items-center justify-center px-4 py-3 border border-gray-600 rounded-lg shadow-sm bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 transition-all duration-200">
+                                    
+                {% load socialaccount %}
+                    <a class="w-full flex items-center justify-center px-4 py-3 border border-gray-600 rounded-lg shadow-sm bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 transition-all duration-200" href="{% provider_login_url 'google' %}" >
                         <svg class="w-5 h-5 mr-2" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M47.532 24.552c0-1.636-.146-3.204-.418-4.696H24v9.086h13.246c-.572 3.086-2.24 5.68-4.76 7.426v6.18h7.692c4.508-4.15 7.354-10.26 7.354-17.996z" fill="#4285F4"/>
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M24 48c6.48 0 11.91-2.15 15.88-5.82l-7.692-6.18c-2.14 1.44-4.86 2.3-8.188 2.3-6.294 0-11.63-4.256-13.54-9.996H2.56v6.26C6.52 43.2 14.64 48 24 48z" fill="#34A853"/>
@@ -89,7 +92,7 @@
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M24 9.52c3.54 0 6.7 1.22 9.2 3.6l6.88-6.88C35.9 2.92 30.48 0 24 0 14.64 0 6.52 4.8 2.56 12.44l7.9 6.26C12.37 13.776 17.7 9.52 24 9.52z" fill="#EA4335"/>
                         </svg>
                         Continue with Google
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
