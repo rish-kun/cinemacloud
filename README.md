@@ -13,7 +13,7 @@
 9. ~~Add option for booking meals (make sure to use otp for that)~~
 10. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.
 11. Implement Search functionality
-12. Show all previous transactions of the user (show theatre name in the "to" for the transaction)
+12. ~~Show all previous transactions of the user (show theatre name in the "to" for the transaction)~~
 13. Implement theatre admin features
 14. ~~Enable Email notifications.~~
 15. Make email verfication system, password change system.
