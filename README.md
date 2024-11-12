@@ -25,3 +25,18 @@
 21. Add location
 22. Add titles for all html pages
 23. Add nginx
+
+Important things to finish
+
+1. Make password change system (by emailing link to change password)
+2. Make theatreadmin system
+3. use decorators to check login
+4. implement search functionality
+5. dockerzie application
+
+UI changes
+
+1. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.
+2. ~~improve UI of the ticket booked page~~
+3. ~~improve UI of the meal booking page~~
+4.
