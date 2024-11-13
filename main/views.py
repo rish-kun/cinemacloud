@@ -291,7 +291,6 @@ class FoodOrderView(View):
         return render(request, "main/food.html", context={"foods": Food.objects.all(), "user": ticket.user, "ticket": ticket})
 
     def post(self, request, ticket_id):
-        ticket = Ticket.objects.get(id=ticket_id)
         print(request.COOKIES['user-identity'])
         print(ticket.user.uuid)
         if str(ticket.user.uuid) != request.COOKIES['user-identity']:
@@ -381,3 +380,17 @@ def wallet(request):
         return resp
 
     return render(request, "main/wallet.html", context={"user": user, "transactions": user.get_transactions()[::-1]})
+
+
+def search_shows(request):
+    query = request.GET.get('query').strip()
+    if query:
+        for show in Show.objects.all():
+            if query in show.movie.title:
+                shows = Show.objects.filter(movie=show.movie)
+
+        if not shows:
+            shows = []
+    else:
+        shows = Show.objects.all()
+    return render(request, 'main/shows_grid.html', {'shows': shows})
