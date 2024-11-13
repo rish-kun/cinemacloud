@@ -33,9 +33,9 @@
 2. ~~Ticket cancellation system~~
 3. Make theatreadmin system
 4. use decorators to check login
-5. implement search functionality
+5. ~~implement search functionality~~
 6. dockerzie application
-7. use group by to show by theatres
+7. ~~use group by to show by theatres~~
    UI changes
 
 8. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.

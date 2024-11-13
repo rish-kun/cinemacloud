@@ -1,6 +1,6 @@
 import datetime
 from django.shortcuts import render, redirect
-from .models import User, Ticket, Show, Movie, Food, Transaction, TheatreAdmin
+from .models import User, Ticket, Show, Movie, Food, Transaction, TheatreAdmin, Theatre
 from django.views import View
 import bcrypt
 from .setup import setup
@@ -250,10 +250,20 @@ class ConfirmTransactionView(View):
         return JsonResponse({"error": "Invalid OTP"}, status=400)
 
 
+def search_shows(request):
+    query = request.GET.get('query').strip()
+    print(query.lower())
+    shows = []
+    if query:
+        for show in Show.objects.all():
+            if query.lower() in show.movie.title.lower():
+                shows.append(show)
+
+    return render(request, 'main/shows_grid.html', {'shows': shows})
+
+
 def not_found_404(request):
     return render(request, "404.html")
-
-# account related views
 
 
 class TicketView(View):
@@ -322,6 +332,15 @@ def ticket(request, ticket_id):
     print("here")
     return render(request, "main/ticket.html", context={"ticket": ticket, "user": ticket.user, "food_orders": ticket.get_orders()})
 
+
+def theatres(request):
+    return render(request, "main/theatres.html", context={"theatres": Theatre.objects.all()})
+
+
+def theatre(request, theatre_id):
+    theatre = Theatre.objects.get(id=theatre_id)
+    return render(request, "main/theatre.html", context={"theatre": theatre, "shows": Show.objects.filter(theatre=theatre)})
+
 # Views related to wallet
 
 
@@ -382,15 +401,4 @@ def wallet(request):
     return render(request, "main/wallet.html", context={"user": user, "transactions": user.get_transactions()[::-1]})
 
 
-def search_shows(request):
-    query = request.GET.get('query').strip()
-    if query:
-        for show in Show.objects.all():
-            if query in show.movie.title:
-                shows = Show.objects.filter(movie=show.movie)
-
-        if not shows:
-            shows = []
-    else:
-        shows = Show.objects.all()
-    return render(request, 'main/shows_grid.html', {'shows': shows})
+# Theatre Admin Views

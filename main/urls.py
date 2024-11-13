@@ -30,4 +30,6 @@ urlpatterns = [
     path("password_change", PasswordChangeView.as_view(), name="password_change"),
     path("account_edit", AccountEditView.as_view(), name="account_edit"),
     path("search/", search_shows, name="search"),
+    path("theatres", theatres, name="theatres"),
+    path("theatre/<uuid:theatre_id>", theatre, name="theatre"),
 ]
