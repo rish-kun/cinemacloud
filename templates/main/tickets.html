@@ -11,8 +11,8 @@
                         <!-- Status Badge -->
                         <span class="px-3 py-1 text-sm font-medium rounded-full
                             {% if ticket.cancelled == False %}bg-green-100 text-green-800
-                            {% elif ticket.cancelled == True %}bg-yellow-100 text-yellow-800
-                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {% elif ticket.cancelled == True %}bg-red-100 text-red-800
+                            {% else %}bg-yellow-100 text-yellow-800{% endif %}">
                             {{ ticket.status|title }}
                         </span>
                         {% comment %} <span class="text-sm text-gray-500 mt-2 md:mt-0">#{{ ticket.show.movie.title }}</span> {% endcomment %}

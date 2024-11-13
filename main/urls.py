@@ -27,4 +27,6 @@ urlpatterns = [
     path("ticket/<uuid:ticket_id>", ticket, name="ticket"),
     path("transaction/<uuid:transaction_id>", transaction, name="transaction"),
     path("transactions", transactions, name="transactions"),
+    path("password_change", PasswordChangeView.as_view(), name="password_change"),
+    path("account_edit", AccountEditView.as_view(), name="account_edit"),
 ]

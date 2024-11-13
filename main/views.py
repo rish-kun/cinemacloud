@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render, redirect
 from .models import User, Ticket, Show, Movie, Food, Transaction, TheatreAdmin
 from django.views import View
@@ -6,6 +7,8 @@ from .setup import setup
 from django.http import HttpResponse, JsonResponse, Http404
 from .utils import gen_otp
 from .mail import send_email, email_body
+
+# Account related views
 
 
 class IndexView(View):
@@ -74,10 +77,58 @@ class LogoutView(View):
         return resp
 
 
+class AccountView(View):
+    def get(self, request):
+        try:
+            request.COOKIES['user-identity']
+        except KeyError:
+            return redirect("main:login")
+        try:
+            user = User.objects.get(uuid=request.COOKIES['user-identity'])
+        except User.DoesNotExist:
+            resp = redirect("main:login")
+            resp.delete_cookie('user-identity')
+            return resp
+        return render(request, "main/account.html", context={"user": user})
+
+
+class PasswordChangeView(View):
+    def get(self, request):
+        return render(request, "main/password_change.html")
+
+    def post(self, request):
+        user = User.objects.get(uuid=request.COOKIES['user-identity'])
+        old_password = request.POST['current_password']
+        new_password = request.POST['new_password']
+        if bcrypt.checkpw(bytes(old_password, 'utf-8'), user.password):
+            user.password = bcrypt.hashpw(
+                bytes(new_password, 'utf-8'), bcrypt.gensalt())
+            user.save()
+            send_email("Your CinemaCloud password has been changed",
+                       f"Your CinemaCloud password has been changed on {datetime.datetime.now()} ", [user.email])
+            return redirect("/account?password_changed=true")
+        return render(request, "main/password_change.html", context={"error": "Invalid Current Password", "user": user})
+
+
+class AccountEditView(View):
+    def get(self, request):
+        user = User.objects.get(uuid=request.COOKIES['user-identity'])
+        return render(request, "main/account_edit.html", context={"user": user})
+
+    def post(self, request):
+        user = User.objects.get(uuid=request.COOKIES['user-identity'])
+        user.name = request.POST['name']
+        user.email = request.POST['email']
+        user.save()
+        return redirect("/account?edit=true")
+
+
 def setup_view(request):
     setup()
     return HttpResponse("Setup Done")
 
+
+# ? Views related to booking/ticketing
 
 class ShowView(View):
     def get(self, request, show_id: str):
@@ -117,25 +168,17 @@ class BookView(View):
 
 
 class CancelTicketView(View):
+    def get(self, request, ticket_id):
+        return render(request, "main/confirm.html", context={"ticket": Ticket.objects.get(id=ticket_id), "user": User.objects.get(uuid=request.COOKIES['user-identity'])})
+
     def post(self, request, ticket_id):
         ticket = Ticket.objects.get(id=ticket_id)
-        if ticket.user.uuid != request.COOKIES['user-identity']:
+        if str(ticket.user.uuid) != request.COOKIES['user-identity']:
             return JsonResponse({"error": "Unauthorized"}, status=403)
 
         if ticket.cancel():
-            return JsonResponse({"message": "Ticket cancelled successfully"})
-        return JsonResponse({"error": "Cannot cancel ticket"}, status=400)
-
-
-def wallet(request):
-    try:
-        user = User.objects.get(uuid=request.COOKIES['user-identity'])
-    except User.DoesNotExist:
-        resp = redirect("main:login")
-        resp.delete_cookie('user-identity')
-        return resp
-
-    return render(request, "main/wallet.html", context={"user": user, "transactions": user.get_transactions()[::-1]})
+            return render(request, "main/ticket.html", context={"ticket": ticket, "user": ticket.user, "food_orders": ticket.get_orders(), "error": "Ticket cancelled successfully"})
+        return render(request, "main/ticket.html", context={"ticket": ticket, "user": ticket.user, "food_orders": ticket.get_orders(), "error": "Ticket cannot be cancelled"})
 
 
 class ConfirmTransactionView(View):
@@ -164,7 +207,7 @@ class ConfirmTransactionView(View):
                     price=total_price,
                     seats=tickets
                 )
-                transaction.exceuted = True
+                transaction.executed = True
                 user.bookings += 1
                 # user.add_ticket(ticket)
                 transaction.save()
@@ -177,7 +220,7 @@ class ConfirmTransactionView(View):
             if otp == transaction.otp:
                 user.wallet.money -= total_price
                 user.wallet.save()
-                transaction.exceuted = True
+                transaction.executed = True
                 transaction.save()
                 return redirect("/wallet?transaction=withdraw")
             return redirect("/wallet?wrong_otp=true")
@@ -186,7 +229,7 @@ class ConfirmTransactionView(View):
             if otp == transaction.otp:
                 user.wallet.money += total_price
                 user.wallet.save()
-                transaction.exceuted = True
+                transaction.executed = True
                 transaction.save()
                 return redirect("/wallet?transaction=add")
             return redirect("/wallet?wrong_otp=true")
@@ -200,64 +243,17 @@ class ConfirmTransactionView(View):
                 ticket.save()
                 user.wallet.money -= total_price
                 user.wallet.save()
-                transaction.exceuted = True
+                transaction.executed = True
                 transaction.save()
                 return redirect(f"/ticket/{ticket_id}?meal_confirm=true")
 
         return JsonResponse({"error": "Invalid OTP"}, status=400)
 
 
-def withdraw(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
-    user = User.objects.get(uuid=request.COOKIES['user-identity'])
-    amount = int(request.POST['amount'])
-    if user.wallet.money < amount:
-        return render(request, "main/wallet.html", context={"error": "Insufficient funds", "user": user})
-    transaction = Transaction.objects.create(
-        user=user,
-        amount=amount,
-        type="withdraw", otp=gen_otp())
-    print(transaction.otp)
-    send_email("OTP for CinemaCloud", email_body.format(
-        otp=int(transaction.otp)), [user.email])
-    transaction.save()
-    return render(request, "main/transaction_verify.html", context={"user": user, "transaction": transaction, "redirect": "withdraw"})
-
-
-def add(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
-    user = User.objects.get(uuid=request.COOKIES['user-identity'])
-    amount = int(request.POST['amount'])
-    transaction = Transaction.objects.create(
-        user=user,
-        amount=amount,
-        type="add", otp=gen_otp())
-    print(transaction.otp)
-    send_email("OTP for CinemaCloud", email_body.format(
-        otp=int(transaction.otp)), [user.email])
-    transaction.save()
-    return render(request, "main/transaction_verify.html", context={"user": user, "transaction": transaction, "redirect": "add"})
-
-
 def not_found_404(request):
     return render(request, "404.html")
 
-
-class AccountView(View):
-    def get(self, request):
-        try:
-            request.COOKIES['user-identity']
-        except KeyError:
-            return redirect("main:login")
-        try:
-            user = User.objects.get(uuid=request.COOKIES['user-identity'])
-        except User.DoesNotExist:
-            resp = redirect("main:login")
-            resp.delete_cookie('user-identity')
-            return resp
-        return render(request, "main/account.html", context={"user": user})
+# account related views
 
 
 class TicketView(View):
@@ -327,6 +323,8 @@ def ticket(request, ticket_id):
     print("here")
     return render(request, "main/ticket.html", context={"ticket": ticket, "user": ticket.user, "food_orders": ticket.get_orders()})
 
+# Views related to wallet
+
 
 def transactions(request):
     user = User.objects.get(uuid=request.COOKIES['user-identity'])
@@ -338,3 +336,48 @@ def transaction(request, transaction_id):
     user = User.objects.get(uuid=request.COOKIES['user-identity'])
     transaction = Transaction.objects.get(id=transaction_id)
     return render(request, "main/transaction.html", context={"transaction": transaction, "user": user})
+
+
+def withdraw(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    user = User.objects.get(uuid=request.COOKIES['user-identity'])
+    amount = int(request.POST['amount'])
+    if user.wallet.money < amount:
+        return render(request, "main/wallet.html", context={"error": "Insufficient funds", "user": user})
+    transaction = Transaction.objects.create(
+        user=user,
+        amount=amount,
+        type="withdraw", otp=gen_otp())
+    print(transaction.otp)
+    send_email("OTP for CinemaCloud", email_body.format(
+        otp=int(transaction.otp)), [user.email])
+    transaction.save()
+    return render(request, "main/transaction_verify.html", context={"user": user, "transaction": transaction, "redirect": "withdraw"})
+
+
+def add(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    user = User.objects.get(uuid=request.COOKIES['user-identity'])
+    amount = int(request.POST['amount'])
+    transaction = Transaction.objects.create(
+        user=user,
+        amount=amount,
+        type="add", otp=gen_otp())
+    print(transaction.otp)
+    send_email("OTP for CinemaCloud", email_body.format(
+        otp=int(transaction.otp)), [user.email])
+    transaction.save()
+    return render(request, "main/transaction_verify.html", context={"user": user, "transaction": transaction, "redirect": "add"})
+
+
+def wallet(request):
+    try:
+        user = User.objects.get(uuid=request.COOKIES['user-identity'])
+    except User.DoesNotExist:
+        resp = redirect("main:login")
+        resp.delete_cookie('user-identity')
+        return resp
+
+    return render(request, "main/wallet.html", context={"user": user, "transactions": user.get_transactions()[::-1]})

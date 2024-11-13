@@ -16,27 +16,30 @@
 12. ~~Show all previous transactions of the user (show theatre name in the "to" for the transaction)~~
 13. Implement theatre admin features
 14. ~~Enable Email notifications.~~
-15. Make email verfication system, password change system.
-16. Check if the seat count decreases for a show when a ticket is booked.
-17. Implement discount system if time is there
-18. Convert application in docker
-19. Make seat booking provisions
-20. Movie cast, trailer link
-21. Add location
-22. Add titles for all html pages
-23. Add nginx
+15. ~~, password change system.~~
+16. Make email verfication system
+17. Check if the seat count decreases for a show when a ticket is booked.
+18. Implement discount system if time is there
+19. Convert application in docker
+20. Make seat booking provisions
+21. Movie cast, trailer link
+22. Add location
+23. Add titles for all html pages
+24. Add nginx
 
-Important things to finish
+## Important things to finish
 
-1. Make password change system (by emailing link to change password)
-2. Make theatreadmin system
-3. use decorators to check login
-4. implement search functionality
-5. dockerzie application
+1. ~~Make password change system (by emailing link to change password)~~
+2. ~~Ticket cancellation system~~
+3. Make theatreadmin system
+4. use decorators to check login
+5. implement search functionality
+6. dockerzie application
+7. use group by to show by theatres
+   UI changes
 
-UI changes
+8. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.
+9. ~~improve UI of the ticket booked page~~
+10. ~~improve UI of the meal booking page~~
 
-1. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.
-2. ~~improve UI of the ticket booked page~~
-3. ~~improve UI of the meal booking page~~
-4.
+11.

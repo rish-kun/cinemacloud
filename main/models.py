@@ -58,6 +58,7 @@ class User(models.Model):
         if bcrypt.checkpw(bytes(password, 'utf-8'), User.objects.get(email=email).password):
             user = User.objects.get(email=email)
             return user
+        return None
 
     def get_transactions(self):
         transactions = Transaction.objects.filter(user=self)
@@ -124,7 +125,7 @@ class Transaction(models.Model):
         100000, 999999), unique=False, editable=False)
     id = models.UUIDField(default=uuid.uuid4, editable=False,
                           unique=True, primary_key=True)
-    exceuted = models.BooleanField(default=False)
+    executed = models.BooleanField(default=False)
     to = models.ForeignKey(TheatreAdmin, on_delete=models.CASCADE, null=True)
     # to should be a dict of the format {"user_type":["normal", 'theatreadmin']}
 
@@ -204,6 +205,9 @@ class Ticket(models.Model):
     food_order_confirmed = models.BooleanField(default=False)
     food_order_price = models.IntegerField(default=0)
 
+    def __str__(self):
+        return f"{self.user.name} - {self.show.movie.title} - {self.show.time}"
+
     def get_orders(self):
         if self.food_orders is not None and self.food_orders != "" and len(self.food_orders) != 0:
             orders = json.loads(self.food_orders)
@@ -234,23 +238,17 @@ class Ticket(models.Model):
             return False
 
         self.cancelled = True
+        self.status = "cancelled"
         self.show.release_seats(self.seats)
 
-        # Create refund transaction
         refund = Transaction.objects.create(
             user=self.user,
-            amount=self.price,
-            type="refund"
+            amount=self.price+self.food_order_price,
+            type="refund", executed=True
         )
-        self.user.money += self.price
+        refund.save()
+        self.user.wallet.money += (self.price+self.food_order_price)
         self.user.save()
-
-        # Refund food orders if any
-        if self.food_orders:
-            food_total = sum(order['price'] * order['quantity']
-                             for order in self.get_orders())
-            self.user.money += food_total
-            self.user.save()
-
+        self.user.wallet.save()
         self.save()
         return True
