@@ -12,7 +12,7 @@
           <h2 class="text-2xl font-semibold text-gray-800">Add New Screen</h2>
         </div>
 
-        <form method="POST" action="{% url "main:th_admin_add_screen" %}" class="divide-y divide-gray-200">
+        <form method="POST" action="{% url "th_admin:add_screen" %}" class="divide-y divide-gray-200">
           {% csrf_token %}
           <div class="py-8 space-y-6">
             <div class="flex flex-col">

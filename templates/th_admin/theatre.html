@@ -1,0 +1,116 @@
+{% extends 'th_admin/base.html' %}
+{% block body %}
+
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <!-- Header Section -->
+        <div class="mb-10">
+            <div class="flex items-center space-x-3 mb-2">
+                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+                </svg>
+                <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Theatre Management</h1>
+            </div>
+            <p class="mt-2 text-lg text-gray-600 max-w-3xl">Manage your theatre details and configuration from this dashboard.</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <form method="POST" action="{% url "th_admin:theatre" %}" class="divide-y divide-gray-200">
+                {% csrf_token %}
+                
+                <!-- Basic Information Section -->
+                <div class="p-8">
+                    <div class="flex items-center space-x-3 mb-8">
+                        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-900">Basic Information</h2>
+                    </div>
+
+                    <div class="space-y-8">
+                        <!-- Theatre Name Field -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                            <label class="block text-sm font-medium text-gray-700 lg:pt-2">
+                                Theatre Name
+                            </label>
+                            <div class="lg:col-span-2 relative">
+                                <div class="relative group">
+                                    <input type="text" name="name" value="{{ theatre.name }}" 
+                                        class="block w-full px-4 py-3 rounded-xl border-2 border-gray-200 
+                                        bg-gray-50 text-gray-700 focus:outline-none focus:border-indigo-500 
+                                        focus:ring-2 focus:ring-indigo-200 transition-all duration-200 ease-in-out
+                                        hover:border-indigo-300"
+                                        placeholder="Enter theatre name">
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" 
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-sm text-gray-500 flex items-center space-x-1">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>The name that will be displayed to customers</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Location Field -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                            <label class="block text-sm font-medium text-gray-700 lg:pt-2">
+                                Location
+                            </label>
+                            <div class="lg:col-span-2 relative">
+                                <div class="relative group">
+                                    <input type="text" name="location" value="{{ theatre.location }}"
+                                        class="block w-full px-4 py-3 rounded-xl border-2 border-gray-200 
+                                        bg-gray-50 text-gray-700 focus:outline-none focus:border-indigo-500 
+                                        focus:ring-2 focus:ring-indigo-200 transition-all duration-200 ease-in-out
+                                        hover:border-indigo-300"
+                                        placeholder="Enter theatre location">
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" 
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-sm text-gray-500 flex items-center space-x-1">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>Full address of your theatre</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="px-8 py-5 bg-gray-50 flex items-center justify-end space-x-4">
+                    <button onclick="history.back()" type="button" 
+                        class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 ease-in-out">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                        class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 ease-in-out">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

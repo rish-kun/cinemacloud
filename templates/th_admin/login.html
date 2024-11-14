@@ -26,7 +26,7 @@
                     <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
                         <h3 class="text-3xl font-bold text-center text-gray-800 mb-8">Theatre Admin Login</h3>
                         
-                        <form method="POST" action="{% url "main:th_admin" %}" class="space-y-6">
+                        <form method="POST" action="{% url "th_admin:th_admin" %}" class="space-y-6">
                             {% csrf_token %}
                             
                             <div class="relative">

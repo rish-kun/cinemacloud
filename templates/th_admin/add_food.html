@@ -19,7 +19,7 @@
             </div>
 
             <!-- Form Section -->
-            <form method="POST" action="{% url "main:th_admin_add_food" %}" class="p-8">
+            <form method="POST" action="{% url "th_admin:add_food" %}" class="p-8">
                 {% csrf_token %}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Food Name -->

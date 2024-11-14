@@ -16,39 +16,52 @@
                 </div>
                 <div class="flex-1 flex flex-col overflow-y-auto">
                     <nav class="flex-1 px-2 py-4 space-y-2">
-                        <a href="{% url 'main:th_admin_home' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
+                        <a href="{% url 'th_admin:home' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
                             <svg class="mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                             </svg>
                             <span>Dashboard</span>
                         </a>
-                        <a href="{% url 'main:th_admin_show' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
+                        <a href="{% url 'th_admin:show' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
                             <svg class="mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
                             </svg>
                             <span>Shows</span>
                         </a>
-                        <a href="{% url 'main:th_admin_food' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
+                        <a href="{% url 'th_admin:food' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
                             <svg class="mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                             </svg>
                             <span>Food</span>
                         </a>
-                        <a href="{% url 'main:th_admin_screen' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
+                        <a href="{% url 'th_admin:screen' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
                             <svg class="mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm0 0v16M4 8h16M8 4v4m8-4v4"/>
                             </svg>
                             <span>Screens</span>
                         </a>
-                        <a href="{% url 'main:th_admin_bookings' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
+                        <a href="{% url 'th_admin:bookings' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
                             <svg class="mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                             </svg>
                             <span>Bookings</span>
                         </a>
+                        <a href="{% url 'th_admin:wallet' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
+                            <svg class="mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l1.5 1.5L3 9m0 0l1.5 1.5L3 12m0 0l1.5 1.5L3 15m0 0l1.5 1.5L3 18m18-12l-1.5 1.5L21 9m0 0l-1.5 1.5L21 12m0 0l-1.5 1.5L21 15m0 0l-1.5 1.5L21 18M12 3v18m0-18h7a2 2 0 012 2v14a2 2 0 01-2 2h-7m0-18H5a2 2 0 00-2 2v14a2 2 0 002 2h7"/>
+                            </svg>
+                            <span>Wallet</span>
+                        </a>
+                        <a href="{% url 'th_admin:theatre' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
+                            <svg class="mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <span>Theatre Config</span>
+                        </a>
                     </nav>
                     <div class="border-t border-gray-700 p-4">
-                        <a href="{% url 'main:th_admin_logout' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
+                        <a href="{% url 'th_admin:logout' %}" class="group flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-all duration-200">
                             <svg class="mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                             </svg>
@@ -71,11 +84,11 @@
             </div>
             <div id="mobile-menu" class="hidden px-2 pt-2 pb-3 bg-gray-900">
                 <!-- Mobile menu items with same styling as sidebar -->
-                <a href="{% url 'main:th_admin_home' %}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
-                <a href="{% url 'main:th_admin_show' %}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Manage Shows</a>
-                <a href="{% url 'main:th_admin_food' %}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Manage Food</a>
-                <a href="{% url 'main:th_admin_bookings' %}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">View Bookings</a>
-                <a href="{% url 'main:th_admin_logout' %}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Logout</a>
+                <a href="{% url 'th_admin:home' %}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                <a href="{% url 'th_admin:show' %}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Manage Shows</a>
+                <a href="{% url 'th_admin:food' %}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Manage Food</a>
+                <a href="{% url 'th_admin:bookings' %}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">View Bookings</a>
+                <a href="{% url 'th_admin:logout' %}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Logout</a>
             </div>
         </div>
 

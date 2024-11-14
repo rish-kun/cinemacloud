@@ -23,4 +23,5 @@ urlpatterns = [
     path("", include("main.urls")),
     path("oauth/", include("oauth.urls")),
     path("accounts/", include("allauth.urls")),
+    path("th_admin/", include("th_admin.urls")),
 ]

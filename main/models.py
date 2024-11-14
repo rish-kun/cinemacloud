@@ -5,7 +5,7 @@ import bcrypt
 from django.shortcuts import redirect
 from django.utils import timezone
 import random
-from .mail import send_email, t_complete
+from .mail import send_email, t_complete, verification_email
 from django.conf import settings
 # from django.contrib.postgres.fields import ArrayField
 
@@ -89,9 +89,24 @@ class User(models.Model):
         else:
             return None
 
+    def send_verification_email(self, request):
+        # send_email("Email Verification", f"Click <a href='http://")
+        hash = str(bcrypt.hashpw(
+            bytes(str(self.uuid), 'utf-8'), bcrypt.gensalt()))
 
-class SuperAdmin(models.Model):
-    pass
+        print(hash)
+        link = f"{
+            request.scheme}://{request.META['HTTP_HOST']}/verify/{hash}/{self.uuid}"
+        send_email("Email Verification for CinemaCloud", verification_email.format(
+            verification_link=link), [self.email])
+        return True
+
+    def check_verification(self, hash):
+        if bcrypt.checkpw(bytes(str(self.uuid), 'utf-8'), bytes(hash, 'utf-8')):
+            self.email_verified = True
+            self.save()
+            return True
+        return False
 
 
 # add logging later
@@ -108,7 +123,6 @@ class Theatre(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
-    seats = models.IntegerField(default=200)
     shows = models.JSONField(null=True, default=None, blank=True)
     admin_uuid = models.UUIDField(default=None, null=True, blank=True)
     default_screen_id = models.UUIDField(default=None, null=True, blank=True)
@@ -153,6 +167,14 @@ class Theatre(models.Model):
     def get_default_screen(self):
         return Screen.objects.get(id=self.default_screen_id)
 
+    def get_revenue(self):
+        revenue = 0
+        for ticket in self.get_bookings():
+            if ticket.status == "used" or ticket.status == "booked":
+                revenue += (ticket.price+ticket.food_order_price)
+
+        return revenue
+
 
 class TheatreAdmin(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -175,6 +197,10 @@ class TheatreAdmin(models.Model):
         self.wallet.th_admin_wallet = True
         self.wallet.save()
         self.save()
+
+    def get_transactions(self):
+        transactions = Transaction.objects.filter(to=self)
+        return transactions
 
 
 class Transaction(models.Model):

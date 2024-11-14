@@ -6,7 +6,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-gray-900">Shows Management</h1>
-            <a href="{% url 'main:th_admin_add_show' %}" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md">
+            <a href="{% url 'th_admin:add_show' %}" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
@@ -69,7 +69,7 @@
 
                         <div class="p-4 bg-gray-50 border-t">
                             <div class="flex justify-end space-x-2">
-                                <form action="{% url "main:th_admin_show" %}" method="POST">
+                                <form action="{% url "th_admin:show" %}" method="POST">
                                 {% csrf_token %}
                                 <button type="submit" class="p-2 text-green-600 hover:bg-green-100 rounded-full transition duration-200" title="View Tickets">
                                     <input type="hidden" name="show_id" value="{{show.id}}">
@@ -78,12 +78,12 @@
                                     </svg>
                                 </button>
                                 </form>
-                                <a href="{% url 'main:th_admin_edit_show' show.id %}" class="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition duration-200">
+                                <a href="{% url 'th_admin:edit_show' show.id %}" class="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition duration-200">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
                                 </a>
-                                <form method="POST" action="{% url "main:th_admin_delete_show" show.id %}">
+                                <form method="POST" action="{% url "th_admin:delete_show" show.id %}">
                                     {% csrf_token %}
                                     <button onclick="confirm('Are you sure you want to delete this show?')" class="p-2 text-red-600 hover:bg-red-100 rounded-full transition duration-200">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

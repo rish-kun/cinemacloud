@@ -34,42 +34,8 @@ urlpatterns = [
     path("theatres", theatres, name="theatres"),
     path("theatre/<uuid:theatre_id>", theatre, name="theatre"),
     path("search_movies/", search_movies, name="search_movies"),
-
+    path("verification_email", verification_email, name="verification_email"),
+    path("verify/<str:token>/<uuid:user_id>",
+         verify_email, name="verify_email"),
 
 ]
-
-th_admin_urls = [
-    path("th_admin", AdminLoginView.as_view(), name="th_admin"),
-    path("th_admin/home", admin_home, name="th_admin_home"),
-    path("th_admin/logout", admin_logout, name="th_admin_logout"),
-    path("th_admin/food", AdminFoodView.as_view(), name="th_admin_food"),
-    path("th_admin/food/edit/<uuid:food_id>",
-         EditFoodView.as_view(), name="th_admin_edit_food"),
-    path("th_admin/food/add/",
-         AddFoodView.as_view(), name="th_admin_add_food"),
-    path("th_admin/food/delete/<uuid:food_id>",
-         delete_food_item, name="th_admin_delete_food"),
-    path("th_admin/show", AdminShowView.as_view(), name="th_admin_show"),
-    path("th_admin/show/edit/<uuid:show_id>",
-         EditShowView.as_view(), name="th_admin_edit_show"),
-    path("th_admin/show/add/",
-         AddShowView.as_view(), name="th_admin_add_show"),
-    path("th_admin/show/delete/<uuid:show_id>",
-         delete_show_view, name="th_admin_delete_show"),
-    path("th_admin/bookings", admin_booking_view, name="th_admin_bookings"),
-    path("th_admin/register", register_th_admin, name="register_th_admin"),
-    path("th_admin/screens", screen_view, name="th_admin_screen"),
-    path("th_admin/screen/add", AddScreenView.as_view(),
-         name="th_admin_add_screen"),
-    path("th_admin/screen/edit/<uuid:screen_id>",
-         EditScreenView.as_view(), name="th_admin_edit_screen"),
-    path("th_admin/screen/delete/<uuid:screen_id>",
-         delete_screen_view, name="th_admin_delete_screen"),
-    path("th_admin/ticket_details/<uuid:ticket_id>", admin_ticket_details,
-         name="th_admin_ticket_details"),
-    path("th_admin/tickets/cancel", admin_ticket_cancel,
-         name="th_admin_cancel_ticket"),
-    path("th_admin/tickets/used", admin_ticket_used, name="th_admin_ticket_used"),
-]
-
-urlpatterns.extend(th_admin_urls)

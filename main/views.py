@@ -1,7 +1,3 @@
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth import login, logout
-from django.contrib.auth.models import User as DjangoUser
 import datetime
 from django.shortcuts import render, redirect
 from .models import User, Ticket, Show, Movie, Food, Transaction, TheatreAdmin, Theatre, Screen
@@ -404,296 +400,30 @@ def wallet(request):
     return render(request, "main/wallet.html", context={"user": user, "transactions": user.get_transactions()[::-1]})
 
 
-# Theatre Admin Views
-
-def is_on_group_check(*groups):
-    def on_group_check(user):
-        if user.groups is None:
-            return False
-        return user.groups.filter(name__in=groups).exists()
-    return on_group_check
-
-
-on_admin_group = is_on_group_check("TheatreAdmin")
-
-
-class AdminLoginView(View):
-    def get(self, request):
-        return render(request, "th_admin/login.html")
-
-    def post(self, request):
-        print("here1")
-        username = request.POST['username']
-        password = request.POST['password']
-        try:
-            user = DjangoUser.objects.get(username=username)
-        except DjangoUser.DoesNotExist:
-            # return error
-            return redirect("main:index")
-        if user.check_password(password) and on_admin_group(user):
-            if user.last_login == None:
-                available_theatres = Theatre.objects.filter(admin_uuid=None)
-                login(request, user,
-                      backend="django.contrib.auth.backends.ModelBackend")
-                return render(request, "th_admin/register_th_admin.html", context={"user": user, "theatres": available_theatres})
-            print("here")
-            login(request, user,
-                  backend="django.contrib.auth.backends.ModelBackend")
-            print("here")
-            return redirect("main:th_admin_home")
-        return render(request, "th_admin/login.html", context={"error": "Invalid Credentials"})
-
-
-@user_passes_test(on_admin_group, login_url="main:th_admin")
-def admin_logout(request):
-    logout(request)
-    return redirect("main:th_admin")
-
-
-@user_passes_test(on_admin_group, login_url="main:th_admin")
-def admin_home(request):
-    th_admin = TheatreAdmin.objects.get(user=request.user)
-    today_shows = th_admin.theatre.get_today_shows()
-    screens = th_admin.theatre.get_screens().count()
-    return render(request, "th_admin/home.html", context={"theatre": TheatreAdmin.objects.get(user=request.user).theatre, "user": TheatreAdmin.objects.get(user=request.user), "today_shows": today_shows, "screens": screens})
-
-
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
-class AdminFoodView(View):
-    def get(self, request):
-        return render(request, "th_admin/food.html", context={"foods": Food.objects.all()})
-
-
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
-class EditFoodView(View):
-    def get(self, request, food_id):
-        food = Food.objects.get(id=food_id)
-        return render(request, "th_admin/edit_food.html", context={"food": food})
-
-    def post(self, request, food_id):
-        # make method such that it updates the food items
-        name = request.POST['name']
-        price = int(request.POST['price'])
-        descrpiton = request.POST['description']
-        category = request.POST['category']
-        image = request.POST['image']
-        food = Food.objects.get(id=food_id)
-        food.name = name
-        food.price = price
-        food.category = category
-        food.description = descrpiton
-        food.image = image
-        food.save()
-        return redirect("main:th_admin_food")
-
-
-class AddFoodView(View):
-    def get(self, request):
-        return render(request, "th_admin/add_food.html")
-
-    def post(self, request):
-        name = request.POST['name']
-        price = int(request.POST['price'])
-        description = request.POST['description']
-        category = request.POST['category']
-        image = request.POST['image']
-        food = Food.objects.create(
-            name=name, price=price, description=description, category=category, image=image)
-        food.save()
-        return redirect("main:th_admin_food")
-
-
-def delete_food_item(request, food_id):
+def verification_email(request):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
-    food = Food.objects.get(id=food_id)
-    food.delete()
-    return redirect("main:th_admin_food")
+    user = User.objects.get(uuid=request.COOKIES['user-identity'])
+    email = user.email
+    if user.email_verified:
+        return JsonResponse({"error": "Email already verified"}, status=400)
+    user.send_verification_email(request)
+    return redirect("/account?verification_email_sent=true")
 
 
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
-class AdminShowView(View):
-    def get(self, request):
-        user = request.user
-        th_admin = TheatreAdmin.objects.get(user=user)
-        return render(request, "th_admin/shows.html", context={"shows": th_admin.theatre.get_shows()})
+def verify_email(request, token, user_id):
+    try:
+        user = User.objects.get(uuid=request.COOKIES['user-identity'])
+    except:
+        user = User.objects.get(uuid=user_id)
+        if user.check_verification(token):
+            resp = redirect("/account?email_verified=true")
+            resp.set_cookie('user-identity', user.uuid)
+            return resp
+        resp = redirect("/account?email_verified=false")
+        resp.set_cookie('user-identity', user.uuid)
+        return resp
 
-    # shows the tickets booked for the show
-    def post(self, request):
-        show_id = request.POST['show_id']
-        show = Show.objects.get(id=show_id)
-        return render(request, "th_admin/show_tickets.html", context={"show": show, "tickets": show.get_tickets()})
-
-
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
-class AddShowView(View):
-    def get(self, request):
-        user = request.user
-        th_admin = TheatreAdmin.objects.get(user=user)
-        theatre = th_admin.theatre
-        return render(request, "th_admin/add_show.html", context={"movies": Movie.objects.all(), "screens": theatre.get_screens()})
-
-    def post(self, request):
-        # add show with given details
-        movie_id = request.POST['movie']
-        date = request.POST['show_date']
-        time = request.POST['show_time']
-        screen_id = request.POST['screen_id']
-        available_seats = request.POST['seats']
-        price = request.POST['price']
-        dt = datetime.datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
-        show = Show.objects.create(movie=Movie.objects.get(id=movie_id), theatre=TheatreAdmin.objects.get(
-            user=request.user).theatre, time=dt, screen=Screen.objects.get(id=screen_id), available_seats=available_seats, price=price)
-        if dt < datetime.datetime.now():
-            show.is_active = False
-
-        show.save()
-        return redirect("main:th_admin_show")
-
-
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
-class EditShowView(View):
-    def get(self, request, show_id):
-        show = Show.objects.get(id=show_id)
-        theatre = TheatreAdmin.objects.get(user=request.user).theatre
-        return render(request, "th_admin/edit_show.html", context={"show": show, "theatre": theatre, "screens": theatre.get_screens()})
-
-    def post(self, request, show_id):
-        date = request.POST['date']
-        time = request.POST['time']
-        price = request.POST['price']
-        screen_id = request.POST['screen_id']
-        show = Show.objects.get(id=show_id)
-        dt = datetime.datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
-        show.time = dt
-        show.price = price
-        show.screen = Screen.objects.get(id=screen_id)
-        show.save()
-        return redirect("main:th_admin_show")
-
-
-def delete_show_view(request, show_id):
-    if request.method != "POST":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
-    show = Show.objects.get(id=show_id)
-    show.delete()
-    return redirect("main:th_admin_show")
-
-# Theatre Admin screen views
-
-
-def screen_view(request):
-    user = request.user
-    theatre = TheatreAdmin.objects.get(user=user).theatre
-    return render(request, "th_admin/screens.html", context={"screens": theatre.get_screens()})
-
-
-class AddScreenView(View):
-    def get(self, request):
-        user = request.user
-        return render(request, "th_admin/add_screen.html", context={"theatre": TheatreAdmin.objects.get(user=user).theatre})
-
-    def post(self, request):
-        screen_number = request.POST['screen_number']
-        seats = request.POST['seats']
-        screen_type = request.POST['screen_type']
-        theatre = TheatreAdmin.objects.get(user=request.user).theatre
-        screen = Screen.objects.create(
-            theatre=theatre, screen_number=screen_number, seats=seats, type=screen_type)
-        screen.save()
-        return redirect("main:th_admin_screen")
-
-
-class EditScreenView(View):
-    def get(self, request, screen_id):
-        screen = Screen.objects.get(id=screen_id)
-        return render(request, "th_admin/edit_screen.html", context={"screen": screen})
-
-    def post(self, request, screen_id):
-        screen_number = request.POST['screen_number']
-        seats = request.POST['seats']
-        screen_type = request.POST['screen_type']
-        screen = Screen.objects.get(id=screen_id)
-        screen.screen_number = screen_number
-        screen.seats = seats
-        screen.type = screen_type
-        screen.save()
-        return redirect("main:th_admin_screen")
-
-
-def delete_screen_view(request, screen_id):
-    if request.method != "POST":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
-    # delete screen with given id
-    theatre = TheatreAdmin.objects.get(user=request.user).theatre
-    if str(theatre.default_screen_id) == str(screen_id):
-        return redirect("/th_admin/screens?error=true")
-    screen = Screen.objects.get(id=screen_id)
-    screen.delete()
-    return redirect("main:th_admin_screen")
-
-
-def admin_booking_view(request):
-    # get all bookings of the theatre
-    theatre = TheatreAdmin.objects.get(user=request.user).theatre
-    bookings = theatre.get_bookings()
-    today_bookings = 0
-    for booking in bookings:
-        if booking.show.time.date == datetime.datetime.now().date():
-            today_bookings += 1
-    total_booked = bookings.filter(status="booked").count()
-    total_completed = bookings.filter(status="used").count()
-    total_cancelled = bookings.filter(status="cancelled").count()
-    return render(request, "th_admin/bookings.html", context={"bookings": bookings, "total_booked": total_booked, "total_completed": total_completed, "total_cancelled": total_cancelled, "today_bookings": today_bookings})
-
-
-def admin_ticket_details(request, ticket_id):
-    ticket = Ticket.objects.get(id=ticket_id)
-    return render(request, "th_admin/ticket_details.html", context={"ticket": ticket, "food_orders": ticket.get_orders()})
-
-
-def admin_ticket_used(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
-    ticket_id = request.POST['ticket_id']
-    ticket = Ticket.objects.get(id=ticket_id)
-    ticket.status = "used"
-    ticket.save()
-    return redirect("main:th_admin_bookings")
-
-
-def admin_ticket_cancel(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
-    ticket_id = request.POST['ticket_id']
-    ticket = Ticket.objects.get(id=ticket_id)
-    ticket.cancel()
-    ticket.save()
-    return redirect("main:th_admin_bookings")
-
-
-def register_th_admin(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
-    user: DjangoUser = request.user
-    theatre_id = request.POST['theatre']
-    first_name = request.POST['first_name']
-    last_name = request.POST['last_name']
-    email = request.POST['email']
-    phone = request.POST['phone']
-    theatre = Theatre.objects.get(id=theatre_id)
-    user.first_name = first_name
-    user.last_name = last_name
-    user.email = email
-    th_admin = TheatreAdmin.objects.create(
-        user=user, phone=phone)
-    th_admin.theatre = theatre
-    user.save()
-
-    th_admin.create_wallet()
-    th_admin.save()
-    theatre.admin_uuid = th_admin.uuid
-    sc = theatre.create_def_screen()
-    sc.save()
-    theatre.save()
-    return redirect("main:th_admin_home")
+    user = User.objects.get(uuid=user_id)
+    if user.check_verification(token):
+        return redirect("/account?email_verified=true")

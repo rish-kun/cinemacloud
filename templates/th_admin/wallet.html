@@ -1,4 +1,4 @@
-{% extends 'base2.html' %}
+{% extends 'th_admin/base.html' %}
 {% block body %}
 
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
@@ -44,7 +44,7 @@
                     </div>
                     <div class="text-center border-l pl-8">
                         <p class="text-sm text-gray-500">Theatre Revenue</p>
-                        <h2 class="text-4xl font-bold text-green-600">₹{{theatre.revenue}}</h2>
+                        <h2 class="text-4xl font-bold text-green-600">₹{{revenue}}</h2>
                     </div>
                 </div>
             </div>
@@ -52,42 +52,11 @@
 
         <!-- Action Buttons Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <!-- Add Money Card -->
-            <div id="add-card" class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <div class="bg-green-100 rounded-full p-3">
-                            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-semibold text-gray-800">Add Money</h3>
-                            <p class="text-sm text-gray-500">Add funds to wallet</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Withdraw Card -->
-            <div id="withdraw-card" class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <div class="bg-red-100 rounded-full p-3">
-                            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-semibold text-gray-800">Withdraw</h3>
-                            <p class="text-sm text-gray-500">Transfer to bank</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      
 
             <!-- Transaction History -->
-            <a href="{% url 'main:transactions' %}" class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <a href="{% url 'th_admin:transactions' %}" class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <div class="p-6">
                     <div class="flex items-center">
                         <div class="bg-blue-100 rounded-full p-3">
@@ -104,36 +73,7 @@
             </a>
         </div>
 
-        <!-- Forms -->
-        <div id="add-form" class="hidden bg-white rounded-xl shadow-lg p-6 mb-6">
-            <form action="{% url 'main:add' %}" method="POST">
-                {% csrf_token %}
-                <h3 class="text-xl font-semibold mb-4">Add Money to Wallet</h3>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-medium mb-2" for="add-amount">Amount</label>
-                    <input class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                           id="add-amount" name="amount" type="number" required placeholder="Enter amount">
-                </div>
-                <button class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
-                    Add Money
-                </button>
-            </form>
-        </div>
-
-        <div id="withdraw-form" class="hidden bg-white rounded-xl shadow-lg p-6">
-            <form action="{% url 'main:withdraw' %}" method="POST">
-                {% csrf_token %}
-                <h3 class="text-xl font-semibold mb-4">Withdraw Money</h3>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-medium mb-2" for="withdraw-amount">Amount</label>
-                    <input class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" 
-                           id="withdraw-amount" name="amount" type="number" required placeholder="Enter amount">
-                </div>
-                <button class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
-                    Withdraw
-                </button>
-            </form>
-        </div>
+       
     </div><br>
     <!-- Recent Transactions Table -->
     <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6">

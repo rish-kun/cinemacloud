@@ -17,8 +17,8 @@
 13. ~~Implement theatre admin features~~
 14. ~~Enable Email notifications.~~
 15. ~~, password change system.~~
-16. Make email verfication system
-17. Check if the seat count decreases for a show when a ticket is booked.
+16. ~~Make email verfication system~~
+17. ~~Check if the seat count decreases for a show when a ticket is booked.~~
 18. Implement discount system if time is there
 19. Convert application in docker
 20. Make seat booking provisions
@@ -37,25 +37,25 @@
 6. dockerzie application
 7. ~~use group by to show by theatres~~
 8. ~~UI changes~~
-9. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.
+9. ~~Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.~~
 10. ~~improve UI of the ticket booked page~~
 11. ~~improve UI of the meal booking page~~
 
 12. ~~Add backend features to theatreadmin system~~
 13. ~~implement oauth login~~
     ~~to do this, login using google by allauth only, after that get the user details and make a normal user from it. then logout the django auth user~~
-14. Make email verfication system
-15. Add theatre admin wallet transaction details
-16. ~~Make movie booking transaction between 2 wallets.~~
-17. ~~Send transaction confirmation email.~~
-18. Allow theatre admin to manage theatre
-19. Add seat numbers
-20. Show theatre revenue
-21. Implement booking checks, cancellation checks (in user and theatreadmin)
-22. Implement transaction status
-23. Migrate DB to postgres
-24. dockerise
-25. implement logging
+    14.~~ Make email verfication system~~
+14. ~~Add theatre admin wallet transaction details~~
+15. ~~Make movie booking transaction between 2 wallets.~~
+16. ~~Send transaction confirmation email.~~
+    18.~~ Allow theatre admin to manage theatre~~
+17. ~~Show theatre revenue~~
+18. Add seat numbers
+19. Implement booking checks, cancellation checks (in user and theatreadmin)
+20. Implement transaction status
+21. Migrate DB to postgres
+22. dockerise
+23. implement logging
 
 ~~Theatre admin~~
 
