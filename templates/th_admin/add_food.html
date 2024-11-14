@@ -1,0 +1,94 @@
+{% extends 'th_admin/base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <!-- Header Section -->
+            <div class="px-8 py-6 bg-gradient-to-r from-indigo-600 to-indigo-700">
+                <div class="flex items-center space-x-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Add New Food Item</h1>
+                        <p class="text-indigo-100 mt-1">Create a new delicious addition to your menu</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Section -->
+            <form method="POST" action="{% url "main:th_admin_add_food" %}" class="p-8">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Food Name -->
+                    <div class="col-span-2 md:col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Food Name</label>
+                        <input type="text" name="name" required 
+                               class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200">
+                    </div>
+
+                    <!-- Price -->
+                    <div class="col-span-2 md:col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Price</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">₹</span>
+                            <input type="number" name="price" required 
+                                   class="w-full pl-8 pr-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200">
+                        </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="col-span-2 md:col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                        <select name="category" required 
+                                class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200">
+                            <option value="">Select a category</option>
+                            <option value="snacks">Snacks</option>
+                            <option value="beverages">Beverages</option>
+                            <option value="combos">Combos</option>
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea name="description" required rows="4"
+                                  class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200"></textarea>
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Food Image URL</label>
+                        <div class="relative">
+                            <input type="url" name="image" required 
+                                   placeholder="https://example.com/image.jpg"
+                                   class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200">
+                            <p class="text-xs text-gray-500 mt-2">Enter a valid image URL (e.g., https://example.com/image.jpg)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                    <button type="button" onclick="window.history.back()" 
+                            class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 flex items-center justify-center space-x-2 transition duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        <span>Cancel</span>
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 px-6 py-3 bg-indigo-600 rounded-lg text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center justify-center space-x-2 transition duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                        </svg>
+                        <span>Create Food Item</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

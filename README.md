@@ -12,9 +12,9 @@
 8. ~~Make page for showing the shows of a particular movie~~
 9. ~~Add option for booking meals (make sure to use otp for that)~~
 10. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.
-11. Implement Search functionality
+11. ~~Implement Search functionality~~
 12. ~~Show all previous transactions of the user (show theatre name in the "to" for the transaction)~~
-13. Implement theatre admin features
+13. ~~Implement theatre admin features~~
 14. ~~Enable Email notifications.~~
 15. ~~, password change system.~~
 16. Make email verfication system
@@ -31,15 +31,28 @@
 
 1. ~~Make password change system (by emailing link to change password)~~
 2. ~~Ticket cancellation system~~
-3. Make theatreadmin system
+3. ~~Make theatreadmin system~~
 4. use decorators to check login
 5. ~~implement search functionality~~
 6. dockerzie application
 7. ~~use group by to show by theatres~~
-   UI changes
+8. UI changes
+9. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.
+10. ~~improve UI of the ticket booked page~~
+11. ~~improve UI of the meal booking page~~
 
-8. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.
-9. ~~improve UI of the ticket booked page~~
-10. ~~improve UI of the meal booking page~~
+12. ~~Add backend features to theatreadmin system~~
+13. implement logging
+14. dockerise
+15. implement oauth login
+    to do this, login using google by allauth only, after that get the user details and make a normal user from it. then logout the django auth user
+    Make email verfication system
 
-11.
+~~create screen class~~
+
+~~Theatre admin~~Done
+
+- ~~screen management~~
+- ~~show management~~
+- ~~food item management~~
+- ~~ticket management~~

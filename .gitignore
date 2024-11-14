@@ -137,6 +137,7 @@ venv.bak/
 
 # Rope project settings
 .ropeproject
+*.sqlite3
 
 # mkdocs documentation
 /site

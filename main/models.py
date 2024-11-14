@@ -5,6 +5,7 @@ import bcrypt
 from django.shortcuts import redirect
 from django.utils import timezone
 import random
+from django.conf import settings
 # from django.contrib.postgres.fields import ArrayField
 
 
@@ -12,6 +13,14 @@ class Wallet(models.Model):
     money = models.IntegerField(default=100)
     user_id = models.UUIDField(default=None, null=True)
     transaction_history = models.JSONField(null=True)
+    th_admin_wallet = models.BooleanField(default=False)
+
+    def __str__(self):
+        if self.th_admin_wallet:
+            th_admin = TheatreAdmin.objects.get(uuid=self.user_id)
+            return f"{th_admin.user.username} - {self.money}"
+        user = User.objects.get(uuid=self.user_id)
+        return f"{user.name} - {self.money}"
 
 
 class User(models.Model):
@@ -37,6 +46,8 @@ class User(models.Model):
     def create_wallet(self):
 
         self.wallet = Wallet.objects.create(user_id=self.uuid)
+        self.wallet.save()
+        self.save()
 
     def get_current_ticket(self):
         pass
@@ -99,19 +110,72 @@ class Theatre(models.Model):
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     seats = models.IntegerField(default=200)
-    shows = models.JSONField(null=True, default=None)
+    shows = models.JSONField(null=True, default=None, blank=True)
+    admin_uuid = models.UUIDField(default=None, null=True, blank=True)
+    default_screen_id = models.UUIDField(default=None, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.location}"
+
+    def get_shows(self):
+        return Show.objects.filter(theatre=self)
+
+    def get_screens(self):
+        return Screen.objects.filter(theatre=self)
+
+    def get_admin(self):
+        return TheatreAdmin.objects.get(uuid=self.admin_uuid)
+
+    def get_movies(self):
+        shows = self.get_shows()
+        movies = []
+        for show in shows:
+            movies.append(show.movie)
+        return movies
+
+    def get_bookings(self):
+        return Ticket.objects.filter(show__theatre=self)
+
+    def get_today_shows(self):
+        shows = Show.objects.filter(theatre=self)
+        today = timezone.now().date()
+        today_shows = []
+        for show in shows:
+            if show.time.date() == today:
+                today_shows.append(show)
+        return today_shows
+
+    def create_def_screen(self):
+        if self.default_screen_id is not None:
+            return
+        sc = Screen.objects.create(theatre=self, screen_number=1, seats=100)
+        return sc
+
+    def get_default_screen(self):
+        return Screen.objects.get(id=self.default_screen_id)
 
 
 class TheatreAdmin(models.Model):
-    username = models.CharField(max_length=256, null=True)
-    email = models.EmailField(unique=True, null=True)
-    password = models.BinaryField(max_length=255, null=True)
-    name = models.CharField(max_length=255, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE, null=True, unique=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     wallet = models.ForeignKey(
-        Wallet, on_delete=models.CASCADE, default=None, null=True)
-    theatre = models.ManyToManyField(
-        Theatre, related_name="admin")
+        Wallet, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    theatre = models.ForeignKey(
+        Theatre, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    phone = models.CharField(max_length=13, null=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.uuid}"
+
+    class Meta:
+        permissions = (("theateradmin", "User is a theater admin"),)
+
+    def create_wallet(self):
+        self.wallet = Wallet.objects.create(user_id=self.uuid)
+        self.wallet.th_admin_wallet = True
+        self.wallet.save()
+        self.save()
 
 
 class Transaction(models.Model):
@@ -152,10 +216,25 @@ class Food(models.Model):
     price = models.IntegerField()
     description = models.TextField()
     image = models.CharField(max_length=255)
+    category = models.CharField(max_length=255, choices=[(
+        'snacks', 'snacks'), ('beverages', 'beverages'), ('combos', 'combos')], default='snacks')
     food_id = models.BigIntegerField(null=True, unique=True, default=None)
 
     def __str__(self):
         return self.name
+
+
+class Screen(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    theatre = models.ForeignKey(Theatre, on_delete=models.CASCADE)
+    screen_number = models.IntegerField()
+    seats = models.JSONField(default=None, null=True)
+    type = models.CharField(max_length=255, choices=[
+                            ('2D', '2D'), ('3D', '3D'), ('IMAX', 'IMAX')], default='2D')
+    # seats = models.ArrayField(default=None, null=True)
+
+    def __str__(self):
+        return f"{self.theatre.name} - {self.screen_number}"
 
 
 class Show(models.Model):
@@ -165,6 +244,7 @@ class Show(models.Model):
     time = models.DateTimeField()
     price = models.IntegerField()
     available_seats = models.IntegerField(default=100, null=False)
+    screen = models.ForeignKey(Screen, default=1, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
 
     def is_full(self):
@@ -183,6 +263,9 @@ class Show(models.Model):
     def release_seats(self, num_seats):
         self.available_seats += num_seats
         self.save()
+
+    def get_tickets(self):
+        return Ticket.objects.filter(show=self)
 
 
 class Ticket(models.Model):

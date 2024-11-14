@@ -1,0 +1,53 @@
+{% extends 'th_admin/base.html' %}
+{% block body %}
+
+<div class="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+  <div class="relative py-3 sm:max-w-xl sm:mx-auto">
+    <div class="relative px-4 py-10 bg-white mx-8 md:mx-0 shadow rounded-3xl sm:p-10">
+      <div class="max-w-md mx-auto">
+        <div class="flex items-center space-x-5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+          </svg>
+          <h2 class="text-2xl font-semibold text-gray-800">Add New Screen</h2>
+        </div>
+
+        <form method="POST" action="{% url "main:th_admin_add_screen" %}" class="divide-y divide-gray-200">
+          {% csrf_token %}
+          <div class="py-8 space-y-6">
+            <div class="flex flex-col">
+              <label class="text-sm font-bold text-gray-600">Screen Number</label>
+              <input type="number" name="screen_number" required class="mt-2 p-2 border rounded-md focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <div class="flex flex-col">
+              <label class="text-sm font-bold text-gray-600">Seating Capacity</label>
+              <input type="number" name="seats" required class="mt-2 p-2 border rounded-md focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <div class="flex flex-col">
+              <label class="text-sm font-bold text-gray-600">Screen Type</label>
+              <select name="screen_type" required class="mt-2 p-2 border rounded-md focus:ring-2 focus:ring-indigo-500">
+                <option value="2D">2D</option>
+                <option value="3D">3D</option>
+                <option value="IMAX">IMAX</option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="pt-4">
+            <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Add Screen
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

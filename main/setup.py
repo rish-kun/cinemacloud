@@ -4,7 +4,7 @@ from .models import Movie, Theatre, Show, Food, TheatreAdmin
 import json
 
 
-def setup():
+def setup(movies=None):
     mov_list = []
     for movie in get_movies():
 
@@ -96,6 +96,8 @@ def setup():
         {'movie': mov_list[8], 'theatre': theatre_list[11],
             'time': '2024-11-26 18:30:00', "price": 240}
     ]
+    if movies:
+        return mov_list
 
     for show in demo_shows:
         Show.objects.create(**show)
