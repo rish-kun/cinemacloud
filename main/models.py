@@ -25,20 +25,18 @@ class Wallet(models.Model):
 
 class User(models.Model):
     email = models.EmailField(unique=True)
-    password = models.BinaryField(max_length=255)
+    password = models.BinaryField(max_length=255, null=True)
     name = models.CharField(max_length=255)
     tickets = models.JSONField(default=list, null=True)
-    # tickets = models.ArrayField(default=None, null=True)
-
     creation_date = models.DateTimeField(
         auto_now_add=True, null=True)
-    # money = models.IntegerField(default=1000)
-    # transaction_history = models.JSONField(default=None, null=True)
+    google_account = models.BooleanField(default=False, editable=False)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     wallet = models.ForeignKey(
         Wallet, on_delete=models.CASCADE, default=None, null=True)
     email_verified = models.BooleanField(default=False)
     bookings = models.IntegerField(default=0)
+    # transaction_history = models.JSONField(default=None, null=True)
 
     def __str__(self):
         return f"{self.name} - {self.email}"
@@ -49,8 +47,8 @@ class User(models.Model):
         self.wallet.save()
         self.save()
 
-    def get_current_ticket(self):
-        pass
+    def get_tickets(self):
+        return Ticket.objects.filter(user=self)
 
     def add_ticket(self, ticket):
         if self.tickets is not None:

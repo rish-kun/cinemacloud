@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="error-container" style="text-align: center; padding: 50px;">
+        <h1 style="color: #ff0000;">Error!</h1>
+        <p style="font-size: 18px;">You cannot login as user through admin email.</p>
+        <p style="margin-top: 20px;">
+            <a href="{% url "main:index" %}" style="text-decoration: none; background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px;">
+                Return to Home
+            </a>
+        </p>
+    </div>
+</body>
+</html>
