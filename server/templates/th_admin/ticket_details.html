@@ -1,0 +1,127 @@
+{% extends 'th_admin/base.html' %}
+{% block body %}
+
+<div class="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto">
+        <!-- Ticket Card -->
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <h1 class="text-2xl font-bold text-white">Ticket #{{ ticket.uuid }}</h1>
+                    <span class="px-3 py-1 rounded-full text-sm 
+                        {% if ticket.status == 'booked' %}bg-green-100 text-green-800
+                        {% elif ticket.status == 'used' %}bg-gray-100 text-gray-800
+                        {% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ ticket.status }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Movie Details -->
+            <div class="p-6 border-b">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0">
+                        <img src="{{ ticket.show.movie.poster_path }}" alt="{{ ticket.show.movie.title }}" class="h-32 w-24 object-cover rounded">
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">{{ ticket.show.movie.title }}</h2>
+                        <div class="mt-2 space-y-1">
+                            <p class="text-gray-600 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                {{ ticket.show.date }}
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {{ ticket.show.time }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Details -->
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Customer Information</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-600">Name</p>
+                        <p class="font-medium">{{ ticket.user.name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Email</p>
+                        <p class="font-medium">{{ ticket.user.email }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Price</p>
+                        <p class="font-medium">{{ ticket.price|add:ticket.food_order_price }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Booking Date</p>
+                        <p class="font-medium">{{ ticket.booked_date }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seat Details -->
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Seat Information</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-gray-100 rounded-full text-sm font-medium text-gray-800">
+                        Seats: {{ ticket.seats }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="p-6 flex justify-end space-x-4">
+                <a href="{% url 'th_admin:home' %}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Go Back
+                </a>
+                <form action="{% url "th_admin:cancel_ticket" %}" method="POST">
+                    {% csrf_token %}
+                <input type="hidden" name="ticket_id" value="{{ ticket.uuid }}">
+                <button onclick="confirmCancel({{ ticket.uuid }})" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Cancel Ticket
+                </button>
+                </form>
+                <form action="{% url "th_admin:ticket_used" %}" method="POST">
+                    {% csrf_token %}
+                <input type="hidden" name="ticket_id" value="{{ ticket.uuid }}">
+                <button onclick="markAsUsed({{ ticket.uuid }})" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Mark as Used
+                </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmCancel(ticketId) {
+    if (confirm('Are you sure you want to cancel this ticket?')) {
+        window.location.href = `/admin/cancel-ticket/${ticketId}/`;
+    }
+}
+
+function markAsUsed(ticketId) {
+    if (confirm('Mark this ticket as used?')) {
+        window.location.href = `/admin/mark-ticket-used/${ticketId}/`;
+    }
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends 'base2.html' %}
+{% block body %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- Hero Section with Pattern -->
+    <div class="relative bg-blue-600 py-8">
+        <div class="absolute inset-0 opacity-10">
+            <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <pattern id="pattern" width="10" height="10" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="1" fill="white"/>
+                </pattern>
+                <rect width="100" height="100" fill="url(#pattern)"/>
+            </svg>
+        </div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl font-extrabold text-white text-center">
+                Food & Beverages
+                <span class="block text-lg font-normal mt-2 text-blue-100">Enhance your movie experience</span>
+            </h1>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {% if error %}
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md" role="alert">
+            <div class="flex">
+                <svg class="h-6 w-6 text-red-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <p>{{ error }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <form action="{% url 'main:order_food' ticket.uuid %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" id="show_id" name="show_id" value="{{ show.uuid }}">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for food in foods %}
+                <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="relative">
+                        <img src="{{ food.image }}" alt="{{ food.name }}" class="w-full h-48 object-cover rounded-t-2xl">
+                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+                            <span class="text-green-600 font-bold">₹{{ food.price }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                            {{ food.name }}
+                        </h2>
+                        <p class="text-gray-600 text-sm mb-4">{{ food.description }}</p>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 11.586V7a4 4 0 014-4z"/>
+                                </svg>
+                            </span>
+                            
+                            <div class="flex items-center space-x-2">
+                                <button type="button" class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" onclick="decrementTickets({{food.food_id}})">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                    </svg>
+                                </button>
+                                <input type="number" id="qty-{{food.food_id}}" name="qty-{{food.food_id}}" class="w-16 text-center border-0 bg-gray-50 rounded-lg focus:ring-2 focus:ring-blue-500" value="0" min="0" max="10">
+                                <button type="button" class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" onclick="incrementTickets({{food.food_id}})">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Fixed Bottom Bar -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-200 shadow-lg">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="text-xl font-bold text-gray-900">Total: <span id="totalCost" class="text-green-600">₹0</span></span>
+                        </div>
+                        <button type="submit" class="inline-flex items-center px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/50 transition-colors">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                            Proceed to Payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function calculateTotalCost() {
+        let total = 0;
+        const inputs = document.querySelectorAll('input[id^="qty-"]');
+        
+        inputs.forEach(input => {
+            const foodId = input.id.split('-')[1];
+            const quantity = parseInt(input.value);
+            const priceElement = input.closest('.bg-white').querySelector('.text-green-600');
+            const price = parseInt(priceElement.textContent.replace('₹', ''));
+            total += quantity * price;
+        });
+
+        document.getElementById('totalCost').textContent = '₹' + total;
+    }
+
+    // Add event listeners to quantity inputs
+    document.querySelectorAll('input[id^="qty-"]').forEach(input => {
+        input.addEventListener('change', calculateTotalCost);
+    });
+
+    // Update total when using increment/decrement buttons
+    const originalIncrement = incrementTickets;
+    incrementTickets = function(count) {
+        originalIncrement(count);
+        calculateTotalCost();
+    };
+
+    const originalDecrement = decrementTickets;
+    decrementTickets = function(count) {
+        originalDecrement(count);
+        calculateTotalCost();
+    };
+
+    function incrementTickets(count) {
+        const input = document.getElementById(`qty-${count}`);
+        if (input.value < 10) {
+            input.value = parseInt(input.value) + 1;
+        }
+    }
+
+    function decrementTickets(count) {
+        const input = document.getElementById(`qty-${count}`);
+        if (input.value > 0) {
+            input.value = parseInt(input.value) - 1;
+        }
+    }
+</script>
+
+{% endblock %}

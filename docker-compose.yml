@@ -1,0 +1,25 @@
+name: cinema-cloud
+services:
+  web:
+    image: web
+    build:
+      context: .
+      # dockerfile: Dockerfile
+    volumes:
+      - ./server:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    command: sh -c "python3 manage.py migrate && python3 manage.py  runserver 0.0.0.0:8000"
+    environment:
+      - DEBUG=1
+  db:
+    container_name: db
+    image: postgres:16.3-alpine
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5432:5432"

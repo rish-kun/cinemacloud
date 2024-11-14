@@ -1,0 +1,227 @@
+{% extends 'th_admin/base.html' %}
+{% block body %}
+
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+    <!-- Alert Messages -->
+    <div id="add-msg" class="hidden max-w-4xl mx-auto mb-8 p-4 bg-green-100 text-green-700 rounded-lg flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path>
+        </svg>
+        Money was added to the wallet successfully.
+    </div>
+    <div id="withdraw-msg" class="hidden max-w-4xl mx-auto mb-8 p-4 bg-red-100 text-red-700 rounded-lg flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path>
+        </svg>
+        Money was withdrawn from the wallet.
+    </div>
+    
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Wallet Card -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0 flex items-center">
+                    <button onclick="history.back()" class="mr-4 group flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                        <span class="bg-gray-50 rounded-full p-2 group-hover:bg-white group-hover:shadow-md transition-all duration-200">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <svg class="h-8 w-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6c0-1.1.9-2 2-2h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6zm17 5h-3a2 2 0 100 4h3m-3-4v4"/>
+                    </svg>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">My Wallet</h1>
+                        <p class="text-gray-500">Manage your funds easily</p>
+                    </div>
+                </div>
+                <div class="flex space-x-8">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Available Balance</p>
+                        <h2 class="text-4xl font-bold text-blue-600">₹{{user.wallet.money}}</h2>
+                    </div>
+                    <div class="text-center border-l pl-8">
+                        <p class="text-sm text-gray-500">Theatre Revenue</p>
+                        <h2 class="text-4xl font-bold text-green-600">₹{{revenue}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+      
+
+            <!-- Transaction History -->
+            <a href="{% url 'th_admin:transactions' %}" class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center">
+                        <div class="bg-blue-100 rounded-full p-3">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-800">History</h3>
+                            <p class="text-sm text-gray-500">View transactions</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+       
+    </div><br>
+    <!-- Recent Transactions Table -->
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-semibold mb-4 flex items-center">
+            <svg class="h-6 w-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Recent Transactions
+        </h3>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for transaction in transactions|slice:":5" %}
+                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                    {% if transaction.type == 'add' %}
+                                    <svg class="h-6 w-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    <a class="hover:text-green-700 transition-colors" href="{% url 'th_admin:transaction' transaction.uuid %}">
+                                        <span class="text-green-600 font-medium">Add Money</span>
+                                    </a>
+                                    {% elif transaction.type == 'withdraw' %}
+                                    <svg class="h-6 w-6 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                                    </svg>
+                                    <a class="hover:text-red-700 transition-colors" href="{% url 'th_admin:transaction' transaction.uuid %}">
+                                        <span class="text-red-600 font-medium">Withdraw</span>
+                                    </a>
+                                    {% elif transaction.type == 'food' %}
+                                    <svg class="h-6 w-6 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3z M12 7v10 M7 12h10"></path>
+                                    </svg>
+                                    <a class="hover:text-blue-700 transition-colors" href="{% url 'th_admin:transaction' transaction.uuid %}">
+                                        <span class="text-blue-600 font-medium">Food</span>
+                                    </a>
+                                    {% elif transaction.type == 'ticket' %}
+                                    <svg class="h-6 w-6 text-blue-800 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                                    </svg>
+                                    <a class="hover:text-blue-900 transition-colors" href="{% url 'th_admin:transaction' transaction.uuid %}">
+                                        <span class="text-blue-800 font-medium">Ticket</span>
+                                    </a>
+                                    {% elif transaction.type == 'refund' %}
+                                    <svg class="h-6 w-6 text-orange-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1.5a2.5 2.5 0 00-2.5-2.5H8m6 4l-2-2m0 0l-2 2m2-2v7"></path>
+                                    </svg>
+                                    <a class="hover:text-orange-700 transition-colors" href="{% url 'th_admin:transaction' transaction.uuid %}">
+                                        <span class="text-orange-600 font-medium">Refund</span>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="font-medium">₹{{ transaction.amount }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ transaction.time|date:"M d, Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if transaction.executed == True %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Success
+                                </span>
+                                {% else %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    Failed
+                                </span>
+                                {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                            No transactions found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const withdrawCard = document.getElementById('withdraw-card');
+    const withdrawForm = document.getElementById('withdraw-form');
+    const addCard = document.getElementById('add-card');
+    const addForm = document.getElementById('add-form');
+
+    withdrawCard.addEventListener('click', function() {
+        withdrawForm.classList.toggle('hidden');
+        addForm.classList.add('hidden');
+    });
+
+    addCard.addEventListener('click', function() {
+        addForm.classList.toggle('hidden');
+        withdrawForm.classList.add('hidden');
+    });
+
+    // Handle form submissions
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            /// e.preventDefault();
+            const amount = this.querySelector('input[type="number"]').value;
+            // Add your form submission logic here
+            console.log('Processing transaction:', amount);
+        });
+    });
+const url = window.location.href;
+const params = new URLSearchParams(window.location.search);
+const uVal = params.get('transaction');
+console.log(uVal==="withdraw")
+if (uVal === 'withdraw') {
+    const m = document.getElementById("withdraw-msg");
+    console.log(m);
+    m.style.display = "block";
+} 
+});
+
+const url = window.location.href;
+const params = new URLSearchParams(window.location.search);
+const uVal = params.get('transaction');
+if (uVal === 'withdraw') {
+    const m = document.getElementById("withdraw-msg");
+    m.style.display = "block";
+} else if (uVal === 'add') {
+    const m = document.getElementById("add-msg")
+    m.style.display = "block";
+    
+}
+
+const url2 = window.location.origin + window.location.pathname;
+window.history.replaceState({}, '', url2);
+
+</script>
+{% endblock %}

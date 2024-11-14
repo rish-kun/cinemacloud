@@ -30,3 +30,5 @@ rsa==4.9
 sqlparse==0.5.1
 uritemplate==4.1.1
 urllib3==2.2.3
+uWSGI==2.0.28
+psycopg2-binary==2.9.10
