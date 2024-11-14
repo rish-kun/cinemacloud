@@ -8,7 +8,7 @@
 4. ~~Don't show movies which are not bookable~~
 5. ~~Make profile settings page~~
 6. ~~Make page which shows tickets~~
-7. Implement google based login
+7. ~~Implement google based login~~
 8. ~~Make page for showing the shows of a particular movie~~
 9. ~~Add option for booking meals (make sure to use otp for that)~~
 10. Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.
@@ -42,8 +42,8 @@
 11. ~~improve UI of the meal booking page~~
 
 12. ~~Add backend features to theatreadmin system~~
-13. implement oauth login
-    to do this, login using google by allauth only, after that get the user details and make a normal user from it. then logout the django auth user
+13. ~~implement oauth login~~
+    ~~to do this, login using google by allauth only, after that get the user details and make a normal user from it. then logout the django auth user~~
 14. Make email verfication system
 15. Add theatre admin wallet transaction details
 16. Make movie booking transaction between 2 wallets.
