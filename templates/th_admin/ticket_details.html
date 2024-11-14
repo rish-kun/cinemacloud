@@ -79,6 +79,12 @@
 
             <!-- Actions -->
             <div class="p-6 flex justify-end space-x-4">
+                <a href="{% url 'main:th_admin' %}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Go Back
+                </a>
                 <form action="{% url "main:th_admin_cancel_ticket" %}" method="POST">
                     {% csrf_token %}
                 <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
