@@ -5,6 +5,7 @@ import bcrypt
 from django.shortcuts import redirect
 from django.utils import timezone
 import random
+from .mail import send_email, t_complete
 from django.conf import settings
 # from django.contrib.postgres.fields import ArrayField
 
@@ -189,7 +190,38 @@ class Transaction(models.Model):
                           unique=True, primary_key=True)
     executed = models.BooleanField(default=False)
     to = models.ForeignKey(TheatreAdmin, on_delete=models.CASCADE, null=True)
-    # to should be a dict of the format {"user_type":["normal", 'theatreadmin']}
+
+    def send_transaction_complete_email(self):
+        send_email("Transaction Complete", t_complete.format(
+            amount=self.amount, type=self.type), [self.user.email,])
+        return True
+
+    def execute(self):
+        if self.executed:
+            return False
+        if self.type == "add":
+            self.user.wallet.money += self.amount
+            self.user.save()
+        elif self.type == "withdraw":
+            self.user.wallet.money -= self.amount
+            self.user.save()
+        elif self.type == "refund":
+            self.user.wallet.money += self.amount
+            self.to.wallet.money -= self.amount
+            self.to.wallet.save()
+            self.to.save()
+        elif self.type == "ticket" or self.type == "food":
+            self.user.wallet.money -= self.amount
+            self.to.wallet.money += self.amount
+            self.to.wallet.save()
+            self.to.save()
+
+        self.executed = True
+        self.user.wallet.save()
+        self.user.save()
+        self.save()
+        self.send_transaction_complete_email()
+        return True
 
 
 class Movie(models.Model):
@@ -312,7 +344,7 @@ class Ticket(models.Model):
         return True
 
     def can_cancel(self):
-        return not self.cancelled and not self.used and self.show.time > timezone.now()
+        return (not self.cancelled and not self.used and self.show.time > timezone.now())
 
     def cancel(self):
         if not self.can_cancel():

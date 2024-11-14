@@ -164,15 +164,11 @@ class BookView(View):
         total_price = n_t * show.price
         if user.wallet.money < total_price:
             return render(request, "main/book.html", {"error": "Insufficient funds", "show": show})
-        th = TheatreAdmin.objects.first()
-        transaction = Transaction(
-            amount=total_price, type="ticket", user=user, to=th, otp=gen_otp())
-        # send otp
+        transaction = Transaction.objects.create(
+            amount=total_price, type="ticket", user=user, otp=gen_otp(), to=show.theatre.get_admin())
         print(transaction.otp)
         send_email("OTP for CinemaCloud", email_body.format(
             otp=int(transaction.otp)), [user.email])
-        transaction.save()
-        # return otp check page
         return render(request, "main/transaction_verify.html", context={"show": show, "user": user, "tickets": n_t, "transaction": transaction, "redirect": "booking"})
 
 
@@ -191,14 +187,12 @@ class CancelTicketView(View):
 
 
 class ConfirmTransactionView(View):
-    def get(self, request, transaction_id):
-        raise Http404
-
     def post(self, request, transaction_id):
         """get transaction from id
          confirm otp"""
+
         user = User.objects.get(uuid=request.COOKIES['user-identity'])
-        transaction = Transaction.objects.get(id=str(transaction_id))
+        transaction = Transaction.objects.get(id=transaction_id)
         total_price = transaction.amount
         otp = int(str(request.POST['otp-1']) + str(request.POST['otp-2']) + str(request.POST['otp-3']) +
                   str(request.POST['otp-4']) +
@@ -208,38 +202,30 @@ class ConfirmTransactionView(View):
             if otp == transaction.otp:
                 tickets = request.POST['tickets']
                 show = Show.objects.get(id=request.POST['show_id'])
-                user.wallet.money -= total_price
-
+                transaction.execute()
                 ticket = Ticket.objects.create(
                     user=user,
                     show=show,
                     price=total_price,
-                    seats=tickets
+                    seats=tickets,
+                    transaction=transaction,
+                    status="booked"
                 )
-                transaction.executed = True
                 user.bookings += 1
-                # user.add_ticket(ticket)
-                transaction.save()
                 ticket.save()
                 user.save()
-                user.wallet.save()
                 return render(request, "main/booked.html", context={"ticket": ticket})
+            return redirect("/book?wrong_otp=true")
 
         elif redir == "withdraw":
             if otp == transaction.otp:
-                user.wallet.money -= total_price
-                user.wallet.save()
-                transaction.executed = True
-                transaction.save()
+                transaction.execute()
                 return redirect("/wallet?transaction=withdraw")
             return redirect("/wallet?wrong_otp=true")
 
         elif redir == "add":
             if otp == transaction.otp:
-                user.wallet.money += total_price
-                user.wallet.save()
-                transaction.executed = True
-                transaction.save()
+                transaction.execute()
                 return redirect("/wallet?transaction=add")
             return redirect("/wallet?wrong_otp=true")
 
@@ -250,11 +236,9 @@ class ConfirmTransactionView(View):
                 ticket.food_order_confirmed = True
                 ticket.food_order_price = transaction.amount
                 ticket.save()
-                user.wallet.money -= total_price
-                user.wallet.save()
-                transaction.executed = True
-                transaction.save()
+                transaction.execute()
                 return redirect(f"/ticket/{ticket_id}?meal_confirm=true")
+            return redirect(f"/ticket/{ticket_id}?wrong_otp=true")
 
         return JsonResponse({"error": "Invalid OTP"}, status=400)
 
@@ -268,7 +252,19 @@ def search_shows(request):
             if query.lower() in show.movie.title.lower():
                 shows.append(show)
 
-    return render(request, 'main/shows_grid.html', {'shows': shows})
+    return render(request, 'main/index.html', {'shows': shows})
+
+
+def search_movies(request):
+    query = request.GET.get('query').strip()
+    print(query.lower())
+    movies = []
+    if query:
+        for movie in Movie.objects.all():
+            if query.lower() in movie.title.lower():
+                movies.append(movie)
+
+    return render(request, 'main/movies.html', {'movies': movies})
 
 
 def not_found_404(request):
@@ -306,12 +302,12 @@ class FoodOrderView(View):
 
     def get(self, request, ticket_id):
         ticket = Ticket.objects.get(id=ticket_id)
-        print(Food.objects.all())
+        if ticket.cancelled == True or ticket.status == "used":
+            return redirect(f"/ticket/{ticket_id}?cancelled_meal=true")
         return render(request, "main/food.html", context={"foods": Food.objects.all(), "user": ticket.user, "ticket": ticket})
 
     def post(self, request, ticket_id):
-        print(request.COOKIES['user-identity'])
-        print(ticket.user.uuid)
+        ticket = Ticket.objects.get(id=ticket_id)
         if str(ticket.user.uuid) != request.COOKIES['user-identity']:
             return JsonResponse({"error": "Unauthorized"}, status=403)
         order_list = {}
@@ -325,14 +321,12 @@ class FoodOrderView(View):
             total_price += food.price * food_qty
         if total_price > ticket.user.wallet.money:
             return render(request, "main/food.html", context={"error": "Insufficient funds", "foods": Food.objects.all(), "user": ticket.user, "ticket": ticket})
-        transaction = Transaction(
-            amount=total_price, type="food", user=ticket.user, otp=gen_otp())
+        transaction = Transaction.objects.create(
+            amount=total_price, type="food", user=ticket.user, otp=gen_otp(), to=ticket.show.theatre.get_admin())
         send_email("OTP for CinemaCloud", email_body.format(
             otp=int(transaction.otp)), [ticket.user.email])
         print(transaction.otp)
-        print(transaction.id)
         transaction.save()
-
         return render(request, "main/transaction_verify.html", context={"user": ticket.user, "transaction": transaction, "redirect": "food", "ticket": ticket})
 
 

@@ -37,9 +37,15 @@
                         <p class="text-gray-500">Manage your funds easily</p>
                     </div>
                 </div>
-                <div class="text-center">
-                    <p class="text-sm text-gray-500">Available Balance</p>
-                    <h2 class="text-4xl font-bold text-blue-600">₹{{user.wallet.money}}</h2>
+                <div class="flex space-x-8">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Available Balance</p>
+                        <h2 class="text-4xl font-bold text-blue-600">₹{{user.wallet.money}}</h2>
+                    </div>
+                    <div class="text-center border-l pl-8">
+                        <p class="text-sm text-gray-500">Theatre Revenue</p>
+                        <h2 class="text-4xl font-bold text-green-600">₹{{theatre.revenue}}</h2>
+                    </div>
                 </div>
             </div>
         </div>

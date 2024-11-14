@@ -33,6 +33,8 @@ urlpatterns = [
     path("search/", search_shows, name="search"),
     path("theatres", theatres, name="theatres"),
     path("theatre/<uuid:theatre_id>", theatre, name="theatre"),
+    path("search_movies/", search_movies, name="search_movies"),
+
 
 ]
 

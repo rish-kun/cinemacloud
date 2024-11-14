@@ -29,6 +29,30 @@ email_body = """
 </html>
 """
 
+t_complete = """
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="max-w-[600px] mx-auto p-5 font-sans bg-gray-50">
+        <div class="text-center p-5 bg-blue-600 text-white rounded">
+            <h1 class="text-2xl">Transaction Complete</h1>
+        </div>
+        <div class="text-center p-5 my-5 bg-white rounded shadow-md">
+            <p>Your transaction has been completed successfully!</p>
+            <div class="mt-4">
+                <p class="text-lg">Amount: ₹{amount}</p>
+                <p class="text-lg">Type: {type}</p>
+            </div>
+        </div>
+        <p class="text-gray-600">Thank you for using CinemaCloud!</p>
+    </div>
+</body>
+</html>
+"""
+
 
 def send_email(subject, body, recipients):
     sender = "python.mailverify@gmail.com"
