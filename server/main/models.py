@@ -7,7 +7,6 @@ from django.utils import timezone
 import random
 from .mail import send_email, t_complete, verification_email
 from django.conf import settings
-# from django.contrib.postgres.fields import ArrayField
 
 
 class Wallet(models.Model):
@@ -38,7 +37,6 @@ class User(models.Model):
         Wallet, on_delete=models.CASCADE, default=None, null=True)
     email_verified = models.BooleanField(default=False)
     bookings = models.IntegerField(default=0)
-    # transaction_history = models.JSONField(default=None, null=True)
 
     def __str__(self):
         return f"{self.name} - {self.email}"
@@ -111,7 +109,6 @@ class User(models.Model):
         return False
 
 
-# add logging later
 class Log(models.Model):
     info = models.CharField(max_length=1000)
     time = models.DateTimeField(auto_now_add=True)
@@ -210,6 +207,20 @@ class TheatreAdmin(models.Model):
     def get_transactions(self):
         transactions = Transaction.objects.filter(to=self)
         return transactions
+
+    def get_revenue_by_food(self):
+        revenue = 0
+        for transaction in self.get_transactions():
+            if transaction.type == "food":
+                revenue += transaction.amount
+        return revenue
+
+    def get_revenue_by_ticket(self):
+        revenue = 0
+        for transaction in self.get_transactions():
+            if transaction.type == "ticket":
+                revenue += transaction.amount
+        return revenue
 
 
 class Transaction(models.Model):
@@ -316,7 +327,6 @@ class Screen(models.Model):
     seats = models.JSONField(default=None, null=True)
     type = models.CharField(max_length=255, choices=[
                             ('2D', '2D'), ('3D', '3D'), ('IMAX', 'IMAX')], default='2D')
-    # seats = models.ArrayField(default=None, null=True)
 
     def __str__(self):
         return f"{self.theatre.name} - {self.screen_number}"

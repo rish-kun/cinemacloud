@@ -1,4 +1,4 @@
-# bookmyshow
+# CinemaCloud
 
 ## Things to do:
 

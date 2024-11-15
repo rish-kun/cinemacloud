@@ -26,24 +26,20 @@ class AdminLoginView(View):
         return render(request, "th_admin/login.html")
 
     def post(self, request):
-        print("here1")
         username = request.POST['username']
         password = request.POST['password']
         try:
             user = DjangoUser.objects.get(username=username)
         except DjangoUser.DoesNotExist:
-            # return error
-            return redirect("main:index")
+            return render(request, "error.html", context={"error": "Invalid Credentials"})
         if user.check_password(password) and on_admin_group(user):
             if user.last_login == None:
                 available_theatres = Theatre.objects.filter(admin_uuid=None)
                 login(request, user,
                       backend="django.contrib.auth.backends.ModelBackend")
                 return render(request, "th_admin/register_th_admin.html", context={"user": user, "theatres": available_theatres})
-            print("here")
             login(request, user,
                   backend="django.contrib.auth.backends.ModelBackend")
-            print("here")
             return redirect("th_admin:home")
         return render(request, "th_admin/login.html", context={"error": "Invalid Credentials"})
 
@@ -77,7 +73,6 @@ class EditFoodView(View):
         return render(request, "th_admin/edit_food.html", context={"food": food})
 
     def post(self, request, food_id):
-        # make method such that it updates the food items
         name = request.POST['name']
         price = int(request.POST['price'])
         descrpiton = request.POST['description']
@@ -126,7 +121,6 @@ class AdminShowView(View):
         th_admin = TheatreAdmin.objects.get(user=user)
         return render(request, "th_admin/shows.html", context={"shows": th_admin.theatre.get_shows()})
 
-    # shows the tickets booked for the show
     def post(self, request):
         show_id = request.POST['show_id']
         show = Show.objects.get(uuid=show_id)
@@ -142,7 +136,6 @@ class AddShowView(View):
         return render(request, "th_admin/add_show.html", context={"movies": Movie.objects.all(), "screens": theatre.get_screens()})
 
     def post(self, request):
-        # add show with given details
         movie_id = request.POST['movie']
         date = request.POST['show_date']
         time = request.POST['show_time']
@@ -248,7 +241,6 @@ def delete_screen_view(request, screen_id):
 
 @user_passes_test(on_admin_group, login_url="main:th_admin")
 def admin_booking_view(request):
-    # get all bookings of the theatre
     theatre = TheatreAdmin.objects.get(user=request.user).theatre
     bookings = theatre.get_bookings()
     today_bookings = 0
@@ -321,7 +313,7 @@ def register_th_admin(request):
 def admin_wallet_view(request):
     th_admin = TheatreAdmin.objects.get(user=request.user)
 
-    return render(request, "th_admin/wallet.html", context={"user": th_admin, "wallet": th_admin.wallet, "revenue": th_admin.theatre.get_revenue(), "transactions": th_admin.get_transactions()})
+    return render(request, "th_admin/wallet.html", context={"user": th_admin, "wallet": th_admin.wallet, "revenue": th_admin.theatre.get_revenue(), "transactions": th_admin.get_transactions(), "food_revenue": th_admin.get_revenue_by_food(), "ticket_revenue": th_admin.get_revenue_by_ticket()})
 
 
 @user_passes_test(on_admin_group, login_url="main:th_admin")

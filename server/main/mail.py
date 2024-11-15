@@ -5,8 +5,7 @@ import os
 load_dotenv()
 subject = "Email Subject"
 body = "This is the body of the text message"
-# recipients = ["f20240545@pilani.bits-pilani.ac.in",
-#               "f20240606@pilani.bits-pilani.ac.in"]
+
 email_body = """
 <!DOCTYPE html>
 <html>
@@ -91,9 +90,3 @@ def send_email(subject, body, recipients):
         smtp_server.sendmail(sender, recipients, msg.as_string())
     print("Message sent!")
     return True
-
-
-# send_email(subject, body, sender, recipients, password)
-
-
-# def verification_email(subject, body, user):
