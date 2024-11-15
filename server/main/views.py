@@ -409,12 +409,12 @@ def verification_email(request):
     return redirect("/account?verification_email_sent=true")
 
 
-def verify_email(request, token, user_id):
+def verify_email(request, query_id, user_id):
     try:
         user = User.objects.get(uuid=request.COOKIES['user-identity'])
     except:
         user = User.objects.get(uuid=user_id)
-        if user.check_verification(token):
+        if user.check_verification(query_id, user_id):
             resp = redirect("/account?email_verified=true")
             resp.set_cookie('user-identity', user.uuid)
             return resp
@@ -423,5 +423,5 @@ def verify_email(request, token, user_id):
         return resp
 
     user = User.objects.get(uuid=user_id)
-    if user.check_verification(token):
+    if user.check_verification(query_id, user_id):
         return redirect("/account?email_verified=true")

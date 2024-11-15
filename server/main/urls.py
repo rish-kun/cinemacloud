@@ -35,7 +35,7 @@ urlpatterns = [
     path("theatre/<uuid:theatre_id>", theatre, name="theatre"),
     path("search_movies/", search_movies, name="search_movies"),
     path("verification_email", verification_email, name="verification_email"),
-    path("verify/<str:token>/<uuid:user_id>",
+    path("verify/<uuid:query_id>/<uuid:user_id>",
          verify_email, name="verify_email"),
 
 ]

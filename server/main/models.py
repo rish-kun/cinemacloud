@@ -94,21 +94,18 @@ class User(models.Model):
             return None
 
     def send_verification_email(self, request):
-        # send_email("Email Verification", f"Click <a href='http://")
-        hash = str(bcrypt.hashpw(
-            bytes(str(self.uuid), 'utf-8'), bcrypt.gensalt()))
-
-        print(hash)
-        link = f"{
-            request.scheme}://{request.META['HTTP_HOST']}/verify/{hash}/{self.uuid}"
+        query = VerificationQuery.objects.create(user=self)
+        link = f"{request.scheme}://{request.META['HTTP_HOST']}/verify/{query.uuid}/{self.uuid}"
         send_email("Email Verification for CinemaCloud", verification_email.format(
             verification_link=link), [self.email])
         return True
-
-    def check_verification(self, hash):
-        if bcrypt.checkpw(bytes(str(self.uuid), 'utf-8'), bytes(hash, 'utf-8')):
-            self.email_verified = True
-            self.save()
+    
+    @staticmethod
+    def check_verification(query_id, uuid):
+        query = VerificationQuery.objects.get(uuid=query_id)
+        if query.user == User.objects.get(uuid=uuid):
+            query.user.email_verified = True
+            query.user.save()
             return True
         return False
 
@@ -406,3 +403,15 @@ class Ticket(models.Model):
         self.transaction.refund()
         self.save()
         return True
+
+
+class VerificationQuery(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True)
+    uuid = models.UUIDField(default=uuid_module.uuid4, unique=True)
+
+    def url(self):
+        return f"/verify/{self.uuid}/{self.user.uuid}"
+    
+
+
+
