@@ -151,7 +151,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # DJANGO OAUTH2
-SITE_ID = 3
+SITE_ID = 2
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
