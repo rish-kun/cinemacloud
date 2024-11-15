@@ -95,11 +95,12 @@ class User(models.Model):
 
     def send_verification_email(self, request):
         query = VerificationQuery.objects.create(user=self)
-        link = f"{request.scheme}://{request.META['HTTP_HOST']}/verify/{query.uuid}/{self.uuid}"
+        link = f"{
+            request.scheme}://{request.META['HTTP_HOST']}/verify/{query.uuid}/{self.uuid}"
         send_email("Email Verification for CinemaCloud", verification_email.format(
             verification_link=link), [self.email])
         return True
-    
+
     @staticmethod
     def check_verification(query_id, uuid):
         query = VerificationQuery.objects.get(uuid=query_id)
@@ -138,6 +139,9 @@ class Theatre(models.Model):
     def get_screens(self):
         return Screen.objects.filter(theatre=self)
 
+    def get_food(self):
+        return Food.objects.filter(theatre=self)
+
     def get_admin(self):
         return TheatreAdmin.objects.get(uuid=self.admin_uuid)
 
@@ -164,6 +168,8 @@ class Theatre(models.Model):
         if self.default_screen_id is not None:
             return
         sc = Screen.objects.create(theatre=self, screen_number=1, seats=100)
+        self.default_screen_id = sc.uuid
+        self.save()
         return sc
 
     def get_default_screen(self):
@@ -295,6 +301,8 @@ class Food(models.Model):
     category = models.CharField(max_length=255, choices=[(
         'snacks', 'snacks'), ('beverages', 'beverages'), ('combos', 'combos')], default='snacks')
     food_id = models.BigIntegerField(null=True, unique=True, default=None)
+    theatre = models.ForeignKey(
+        Theatre, on_delete=models.DO_NOTHING, null=True)
 
     def __str__(self):
         return self.name
@@ -411,7 +419,3 @@ class VerificationQuery(models.Model):
 
     def url(self):
         return f"/verify/{self.uuid}/{self.user.uuid}"
-    
-
-
-

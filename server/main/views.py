@@ -296,7 +296,7 @@ class FoodOrderView(View):
         ticket = Ticket.objects.get(uuid=ticket_id)
         if ticket.cancelled == True or ticket.status == "used":
             return redirect(f"/ticket/{ticket_id}?cancelled_meal=true")
-        return render(request, "main/food.html", context={"foods": Food.objects.all(), "user": ticket.user, "ticket": ticket})
+        return render(request, "main/food.html", context={"foods": ticket.show.theatre.get_food(), "user": ticket.user, "ticket": ticket})
 
     def post(self, request, ticket_id):
         ticket = Ticket.objects.get(uuid=ticket_id)
@@ -306,7 +306,7 @@ class FoodOrderView(View):
             return render(request, "error.html", context={"error": "Cannot cancel food order now"})
         order_list = {}
         total_price = 0
-        for food in Food.objects.all():
+        for food in ticket.show.theatre.get_food():
             print(food.name)
             food_qty = int(request.POST[f'qty-{food.food_id}'])
             if food_qty != 0:

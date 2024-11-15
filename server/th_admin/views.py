@@ -65,7 +65,9 @@ def admin_home(request):
 @method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
 class AdminFoodView(View):
     def get(self, request):
-        return render(request, "th_admin/food.html", context={"foods": Food.objects.all()})
+        user = request.user
+        th_admin = TheatreAdmin.objects.get(user=user)
+        return render(request, "th_admin/food.html", context={"foods": th_admin.theatre.get_food()})
 
 
 @method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
@@ -104,6 +106,7 @@ class AddFoodView(View):
         food_id = random.randint(100000, 999999)
         food = Food.objects.create(
             name=name, price=price, description=description, category=category, image=image, food_id=food_id)
+        food.theatre = TheatreAdmin.objects.get(user=request.user).theatre
         food.save()
         return redirect("th_admin:food")
 
