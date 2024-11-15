@@ -11,15 +11,15 @@
                         Transaction Details
                     </span>
                 </h1>
-                <span class="inline-flex items-center px-4 py-2 rounded-full {% if transaction.type == 'add' or transaction.type == 'refund' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                <span class="inline-flex items-center px-4 py-2 rounded-full {% if transaction.type == 'add' or transaction.status == 'REVERTED' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        {% if transaction.type == 'add' or transaction.type == 'refund' %}
+                        {% if transaction.type == 'add' or transaction.status == 'REVERTED' %}
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"/>
                         {% else %}
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"/>
                         {% endif %}
                     </svg>
-                    {{ transaction.type|title }}
+                    {{ transaction.status|title }}
                 </span>
             </div>
 
@@ -44,12 +44,12 @@
                     <div class="bg-gray-50 rounded-xl p-6 shadow-sm">
                         <div class="flex items-center justify-between mb-4">
                             <span class="text-gray-500">Amount</span>
-                            <span class="text-3xl font-bold {% if transaction.type == 'credit' %}text-green-600{% else %}text-red-600{% endif %}">
+                            <span class="text-3xl font-bold {% if transaction.type == 'add' or transaction.status == 'REVERTED' %}text-green-600{% else %}text-red-600{% endif %}">
                                 ₹{{ transaction.amount }}
                             </span>
                         </div>
                         <div class="h-1 w-full bg-gray-200 rounded-full mb-4">
-                            <div class="h-1 rounded-full {% if transaction.type == 'credit' %}bg-green-500{% else %}bg-red-500{% endif %} w-full"></div>
+                            <div class="h-1 rounded-full {% if transaction.type == 'add' or transaction.status == 'REVERTED'  %}bg-green-500{% else %}bg-red-500{% endif %} w-full"></div>
                         </div>
                     </div>
 

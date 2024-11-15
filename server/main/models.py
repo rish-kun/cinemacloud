@@ -99,7 +99,8 @@ class User(models.Model):
             bytes(str(self.uuid), 'utf-8'), bcrypt.gensalt()))
 
         print(hash)
-        link = f"{request.scheme}://{request.META['HTTP_HOST']}/verify/{hash}/{self.uuid}"
+        link = f"{
+            request.scheme}://{request.META['HTTP_HOST']}/verify/{hash}/{self.uuid}"
         send_email("Email Verification for CinemaCloud", verification_email.format(
             verification_link=link), [self.email])
         return True
@@ -220,6 +221,8 @@ class Transaction(models.Model):
     uuid = models.UUIDField(default=uuid_module.uuid4, editable=False,
                             unique=True, primary_key=True)
     executed = models.BooleanField(default=False)
+    status = models.CharField(max_length=255, choices=[(
+        'INCOMPLETE', 'INCOMPLETE'), ('COMPLETE', 'COMPLETE'), ('REVERTED', 'REVERTED')], default='INCOMPLETE')
     to = models.ForeignKey(TheatreAdmin, on_delete=models.CASCADE, null=True)
 
     def send_transaction_complete_email(self):
@@ -248,10 +251,24 @@ class Transaction(models.Model):
             self.to.save()
 
         self.executed = True
+        self.status = "COMPLETE"
         self.user.wallet.save()
         self.user.save()
         self.save()
         self.send_transaction_complete_email()
+        return True
+
+    def refund(self):
+        if self.type == "food" or self.type == "ticket":
+            self.user.wallet.money += self.amount
+            self.to.wallet.money -= self.amount
+            self.status = "REVERTED"
+            self.to.wallet.save()
+            self.to.save()
+            self.user.wallet.save()
+            self.user.save()
+            self.save()
+            return True
         return True
 
 
@@ -383,19 +400,9 @@ class Ticket(models.Model):
     def cancel(self):
         if not self.can_cancel():
             return False
-
         self.cancelled = True
         self.status = "cancelled"
         self.show.release_seats(self.seats)
-
-        refund = Transaction.objects.create(
-            user=self.user,
-            amount=self.price+self.food_order_price,
-            type="refund", executed=True
-        )
-        refund.save()
-        self.user.wallet.money += (self.price+self.food_order_price)
-        self.user.save()
-        self.user.wallet.save()
+        self.transaction.refund()
         self.save()
         return True

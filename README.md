@@ -1,46 +1,51 @@
 # CinemaCloud
 
-A Django-based movie ticket booking system with features for users and theatre administrators. The application uses PostgreSQL for data storage and is containerized using Docker.
+A full-featured movie ticket booking system built with Django, featuring user and theatre administration capabilities. The application uses PostgreSQL for data storage and is containerized using Docker for easy deployment.
 
 ## Features
 
-- User Authentication
+### User Features
+
+- **Authentication**
 
   - Email & Password login
   - Google OAuth integration
-  - Email verification system
-  - Password reset functionality
+  - Email verification
+  - Secure password reset
 
-- Booking System
+- **Booking Management**
 
-  - Movie ticket booking
+  - Movie ticket booking with seat selection
   - Food & beverage ordering
-  - Ticket cancellation
-  - Seat selection
-  - Digital wallet for transactions
-
-- Theatre Administration
-
-  - Screen management
-  - Show scheduling
-  - Food item management
-  - Revenue tracking
+  - Digital wallet transactions
+  - Ticket cancellation system
+  - Email confirmations for bookings
   - Transaction history
 
-- Additional Features
-  - Search functionality
-  - Email notifications
+- **User Experience**
+  - Movie search functionality
   - Location-based theatre filtering
-  - Secure payment processing
+  - Profile management
+  - Booking history
+
+### Theatre Administration
+
+- **Theatre Management**
+  - Screen configuration
+  - Show scheduling
+  - Food item inventory
+  - Revenue tracking
+  - Transaction monitoring
+  - Wallet management
 
 ## Tech Stack
 
-- Backend: Django
-- Database: PostgreSQL
-- Web Server: Nginx
-- WSGI Server: Gunicorn
-- Containerization: Docker
-- Authentication: Django AllAuth
+- **Backend**: Django
+- **Database**: PostgreSQL
+- **Web Server**: Nginx
+- **WSGI Server**: Gunicorn
+- **Authentication**: Django AllAuth
+- **Containerization**: Docker
 
 ## Setup Instructions
 
@@ -48,59 +53,7 @@ A Django-based movie ticket booking system with features for users and theatre a
 
 1. Clone the repository
 
-2. Build and run the development containers:
-
 ```sh
-docker-compose up --build
-```
-
-```sh
-docker-compose -f docker-compose.prod.yml up --build
-```
-
-This will start:
-
-- Django with Gunicorn
-- PostgreSQL database
-- Nginx server on port 8080
-
-### Initial Setup
-
-After the containers are running, set up the initial data:
-
-1. Create database migrations:
-
-```sh
-docker-compose exec web python manage.py migrate
-```
-
-2. Load initial data (movies, theatres, etc.):
-
-```sh
-docker-compose exec web python manage.py setup
-```
-
-## Project Structure
-
-```
-├── nginx/                 # Nginx configuration
-├── server/               # Django application
-│   ├── main/            # Main application module
-│   ├── oauth/           # OAuth integration
-│   ├── th_admin/        # Theatre admin module
-│   └── templates/       # HTML templates
-├── docker-compose.yml    # Development configuration
-└── docker-compose.prod.yml # Production configuration
-```
-
-## Contributing
-
-Please ensure all new features include appropriate tests and documentation.
-
-## License
-
-All rights reserved. Unauthorized copying or distribution is prohibited.
-
-```
-
+git clone <repository-url>
+cd cinemacloud
 ```

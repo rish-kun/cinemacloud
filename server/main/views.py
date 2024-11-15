@@ -1,13 +1,12 @@
+from .mail import send_email, email_body
 import datetime
 from django.shortcuts import render, redirect
 from .models import User, Ticket, Show, Movie, Food, Transaction, TheatreAdmin, Theatre, Screen
 from django.views import View
 import bcrypt
 from .setup import setup
-from django.http import HttpResponse, JsonResponse, Http404
+from django.http import HttpResponse
 from .utils import gen_otp
-from .mail import send_email, email_body
-
 # Account related views
 
 
@@ -173,8 +172,7 @@ class CancelTicketView(View):
     def post(self, request, ticket_id):
         ticket = Ticket.objects.get(uuid=ticket_id)
         if str(ticket.user.uuid) != request.COOKIES['user-identity']:
-            return JsonResponse({"error": "Unauthorized"}, status=403)
-
+            return render(request, "error.html", context={"error": "Unauthorized"})
         if ticket.cancel():
             return render(request, "main/ticket.html", context={"ticket": ticket, "user": ticket.user, "food_orders": ticket.get_orders(), "error": "Ticket cancelled successfully"})
         return render(request, "main/ticket.html", context={"ticket": ticket, "user": ticket.user, "food_orders": ticket.get_orders(), "error": "Ticket cannot be cancelled"})
@@ -209,7 +207,7 @@ class ConfirmTransactionView(View):
                 ticket.save()
                 user.save()
                 return render(request, "main/booked.html", context={"ticket": ticket})
-            return redirect("/book?wrong_otp=true")
+            return render(request, "error.html", context={"error": "Invalid OTP"})
 
         elif redir == "withdraw":
             if otp == transaction.otp:
@@ -234,7 +232,7 @@ class ConfirmTransactionView(View):
                 return redirect(f"/ticket/{ticket_id}?meal_confirm=true")
             return redirect(f"/ticket/{ticket_id}?wrong_otp=true")
 
-        return JsonResponse({"error": "Invalid OTP"}, status=400)
+        return render(request, "error.html", context={"error": "Invalid OTP"})
 
 
 def search_shows(request):
@@ -303,7 +301,9 @@ class FoodOrderView(View):
     def post(self, request, ticket_id):
         ticket = Ticket.objects.get(uuid=ticket_id)
         if str(ticket.user.uuid) != request.COOKIES['user-identity']:
-            return JsonResponse({"error": "Unauthorized"}, status=403)
+            return render(request, "error.html", context={"error": "Unauthorized"})
+        if not ticket.can_cancel():
+            return render(request, "error.html", context={"error": "Cannot cancel food order now"})
         order_list = {}
         total_price = 0
         for food in Food.objects.all():
@@ -355,7 +355,7 @@ def transaction(request, transaction_id):
 
 def withdraw(request):
     if request.method != "POST":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
+        return render(request, "error.html", context={"error": "Method not allowed"})
     user = User.objects.get(uuid=request.COOKIES['user-identity'])
     amount = int(request.POST['amount'])
     if user.wallet.money < amount:
@@ -373,7 +373,7 @@ def withdraw(request):
 
 def add(request):
     if request.method != "POST":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
+        return render(request, "error.html", context={"error": "Method not allowed"})
     user = User.objects.get(uuid=request.COOKIES['user-identity'])
     amount = int(request.POST['amount'])
     transaction = Transaction.objects.create(
@@ -400,11 +400,11 @@ def wallet(request):
 
 def verification_email(request):
     if request.method != "POST":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
+        return render(request, "error.html", context={"error": "Method not allowed"})
     user = User.objects.get(uuid=request.COOKIES['user-identity'])
     email = user.email
     if user.email_verified:
-        return JsonResponse({"error": "Email already verified"}, status=400)
+        return render(request, "error.html", context={"error": "Email already verified"})
     user.send_verification_email(request)
     return redirect("/account?verification_email_sent=true")
 

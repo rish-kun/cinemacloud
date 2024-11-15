@@ -47,14 +47,13 @@
 15. ~~Add theatre admin wallet transaction details~~
 16. ~~Make movie booking transaction between 2 wallets.~~
 17. ~~Send transaction confirmation email.~~
-    18.~~ Allow theatre admin to manage theatre~~
-18. ~~Show theatre revenue~~
-19. Add seat numbers
-20. Implement booking checks, cancellation checks (in user and theatreadmin)
-21. Implement transaction status
-22. ~~Migrate DB to postgres~~
-23. ~~dockerise~~
-24. implement logging
+18. ~~ Allow theatre admin to manage theatre~~
+19. ~~Show theatre revenue~~
+20. Add seat numbers
+21. ~~Implement booking checks, cancellation checks (in user and theatreadmin)~~
+22. ~~Implement transaction status~~
+23. ~~Migrate DB to postgres~~
+24. ~~dockerise~~
 
 ~~Theatre admin~~
 
