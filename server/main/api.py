@@ -33,7 +33,7 @@ class Movie():
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?language=en-US"
         headers = {
             "accept": "application/json",
-            "Authorization": f"Bearer {os.getenv("TMDB_API_READ_TOKEN")}"
+            "Authorization": f"Bearer {os.getenv('TMDB_API_READ_TOKEN')}"
         }
         response = requests.get(url, headers=headers)
         # print(response.text)
@@ -52,7 +52,7 @@ def get_movies():
     url = "https://api.themoviedb.org/3/movie/popular?language=en-US&page=1"
     headers = {
         "accept": "application/json",
-        "Authorization": f"Bearer {os.getenv("TMDB_API_READ_TOKEN")}"
+        "Authorization": f"Bearer {os.getenv('TMDB_API_READ_TOKEN')}"
     }
     response = requests.get(url, headers=headers)
 
@@ -92,7 +92,7 @@ def get_movie(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?language=en-US"
     headers = {
         "accept": "application/json",
-        "Authorization": f"Bearer {os.getenv("TMDB_API_READ_TOKEN")}"
+        "Authorization": f"Bearer {os.getenv('TMDB_API_READ_TOKEN')}"
     }
     response = requests.get(url, headers=headers)
     # print(response.text)
