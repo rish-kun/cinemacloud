@@ -98,8 +98,8 @@ def setup(movies=None):
             'time': '2024-11-26 18:30:00', "price": 240}
     ]
 
-    for show in demo_shows:
-        Show.objects.create(**show)
+    # for show in demo_shows:
+    #     Show.objects.create(**show)
 
     # add food items
     demo_food_items = [
