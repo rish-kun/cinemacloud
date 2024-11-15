@@ -20,12 +20,11 @@
 16. ~~Make email verfication system~~
 17. ~~Check if the seat count decreases for a show when a ticket is booked.~~
 18. Implement discount system if time is there
-19. Convert application in docker
+19. ~~Convert application in docker~~
 20. Make seat booking provisions
-21. Movie cast, trailer link
-22. Add location
-23. Add titles for all html pages
-24. Add nginx
+21. ~~Add location~~
+22. Add titles for all html pages
+23. Add nginx
 
 ## Important things to finish
 
@@ -34,7 +33,7 @@
 3. ~~Make theatreadmin system~~
 4. use decorators to check login
 5. ~~implement search functionality~~
-6. dockerzie application
+6. ~~dockerzie application~~
 7. ~~use group by to show by theatres~~
 8. ~~UI changes~~
 9. ~~Change layout of the movie-shows page, putting more information on the place and stuff than the image of the movie.~~
@@ -44,18 +43,18 @@
 12. ~~Add backend features to theatreadmin system~~
 13. ~~implement oauth login~~
     ~~to do this, login using google by allauth only, after that get the user details and make a normal user from it. then logout the django auth user~~
-    14.~~ Make email verfication system~~
-14. ~~Add theatre admin wallet transaction details~~
-15. ~~Make movie booking transaction between 2 wallets.~~
-16. ~~Send transaction confirmation email.~~
+14. ~~ Make email verfication system~~
+15. ~~Add theatre admin wallet transaction details~~
+16. ~~Make movie booking transaction between 2 wallets.~~
+17. ~~Send transaction confirmation email.~~
     18.~~ Allow theatre admin to manage theatre~~
-17. ~~Show theatre revenue~~
-18. Add seat numbers
-19. Implement booking checks, cancellation checks (in user and theatreadmin)
-20. Implement transaction status
-21. Migrate DB to postgres
-22. dockerise
-23. implement logging
+18. ~~Show theatre revenue~~
+19. Add seat numbers
+20. Implement booking checks, cancellation checks (in user and theatreadmin)
+21. Implement transaction status
+22. ~~Migrate DB to postgres~~
+23. ~~dockerise~~
+24. implement logging
 
 ~~Theatre admin~~
 

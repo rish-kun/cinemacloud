@@ -43,8 +43,6 @@ class LoginView(View):
         else:
             return render(request, "main/login.html", context={"error": "Invalid Credentials"})
 
-        pass
-
 
 class SignupView(View):
     def get(self, request):

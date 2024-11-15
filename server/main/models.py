@@ -66,8 +66,11 @@ class User(models.Model):
     def authenticate(self, request):
         email = request.POST['email']
         password = request.POST['password']
-        if bcrypt.checkpw(bytes(password, 'utf-8'), User.objects.get(email=email).password):
-            user = User.objects.get(email=email)
+        user = User.objects.get(email=email)
+        if type(user.password) == memoryview:
+            if bcrypt.checkpw(bytes(password, 'utf-8'), user.password.tobytes()):
+                return user
+        if bcrypt.checkpw(bytes(password, 'utf-8'), user.password):
             return user
         return None
 
