@@ -1,0 +1,43 @@
+name: cinema-cloud-prod
+services:
+  web:
+    stdin_open: true
+    tty: true
+    image: web-prod
+    build:
+      context: .
+    volumes:
+      - static_data:/vol/web
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=django-insecure-qrp94kobf6t*mz0-g=(hnf9609r_wmi(f1goa@!tf@^8(jdb64
+      - ALLOWED_HOSTS=127.0.0.1,localhost
+
+  db:
+    container_name: db-prod
+    image: postgres:16.3-alpine
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5432:5432"
+  proxy:
+    links:
+      - web
+    build:
+      context: ./proxy
+    volumes:
+      - static_data:/vol/static
+    ports:
+      - "8080:8080"
+    depends_on:
+      - web
+      - db
+
+volumes:
+  static_data:

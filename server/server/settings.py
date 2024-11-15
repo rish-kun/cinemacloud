@@ -20,12 +20,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-qrp94kobf6t*mz0-g=(hnf9609r_wmi(f1goa@!tf@^8(jdb64"
+SECRET_KEY = os.getenv("SECRET_KEY", "oops_no_secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(int(os.environ.get("DEBUG", 1)))
 
 ALLOWED_HOSTS = []
+ALLOWED_HOSTS_ENV = os.getenv("ALLOWED_HOSTS")
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS.extend(ALLOWED_HOSTS_ENV.split(","))
 
 
 # Application definition
@@ -164,4 +167,10 @@ AUTHENTICATION_BACKENDS = (
 SOCIALACCOUNT_LOGIN_ON_GET = True
 # LOGIN_REDIRECT_URL = '/oauth/login'
 # LOGOUT_REDIRECT_URL = '/oauth/logout'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+MEDIA_URL = f"{os.path.join(BASE_DIR, 'media')}/"
+STATIC_URL = f"{os.path.join(BASE_DIR, 'static')}/"
+
+
+STATIC_ROOT = '/vol/web/static/'
+MEDIA_ROOT = '/vol/web/media/'
