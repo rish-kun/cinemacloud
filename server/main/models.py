@@ -96,8 +96,7 @@ class User(models.Model):
             bytes(str(self.uuid), 'utf-8'), bcrypt.gensalt()))
 
         print(hash)
-        link = f"{
-            request.scheme}://{request.META['HTTP_HOST']}/verify/{hash}/{self.uuid}"
+        link = f"{request.scheme}://{request.META['HTTP_HOST']}/verify/{hash}/{self.uuid}"
         send_email("Email Verification for CinemaCloud", verification_email.format(
             verification_link=link), [self.email])
         return True

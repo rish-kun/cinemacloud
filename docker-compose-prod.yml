@@ -1,43 +1,30 @@
-name: cinema-cloud-prod
 services:
   web:
-    stdin_open: true
-    tty: true
-    image: web-prod
     build:
-      context: .
+      context: ./server
+      dockerfile: Dockerfile.prod
     volumes:
-      - static_data:/vol/web
-    ports:
-      - "8000:8000"
+      - static_volume:/home/app/web/staticfiles
+    command: gunicorn server.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - 8000
+    env_file:
+      - server/.env
     depends_on:
       - db
-    environment:
-      - DEBUG=1
-      - SECRET_KEY=django-insecure-qrp94kobf6t*mz0-g=(hnf9609r_wmi(f1goa@!tf@^8(jdb64
-      - ALLOWED_HOSTS=127.0.0.1,localhost
-
   db:
-    container_name: db-prod
-    image: postgres:16.3-alpine
-    environment:
-      POSTGRES_DB: "postgres"
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
-    ports:
-      - "5432:5432"
-  proxy:
-    links:
-      - web
-    build:
-      context: ./proxy
+    image: postgres:15
     volumes:
-      - static_data:/vol/static
+      - postgres_data:/var/lib/postgresql/data/
+
+  nginx:
+    build: ./nginx
     ports:
-      - "8080:8080"
+      - 1337:80
+    volumes:
+      - static_volume:/home/app/web/staticfiles
     depends_on:
       - web
-      - db
-
 volumes:
-  static_data:
+  postgres_data:
+  static_volume:
