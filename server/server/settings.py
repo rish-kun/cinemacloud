@@ -59,7 +59,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'allauth.account.middleware.AccountMiddleware'
+    'allauth.account.middleware.AccountMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
 ]
 
 ROOT_URLCONF = "server.urls"
@@ -149,7 +151,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # DJANGO OAUTH2
-SITE_ID = 2
+SITE_ID = 3
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -168,9 +170,14 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 # LOGIN_REDIRECT_URL = '/oauth/login'
 # LOGOUT_REDIRECT_URL = '/oauth/logout'
 
-MEDIA_URL = f"{os.path.join(BASE_DIR, 'media')}/"
-STATIC_URL = f"{os.path.join(BASE_DIR, 'static')}/"
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR/'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = "/media/"
 
-
-STATIC_ROOT = '/vol/web/static/'
-MEDIA_ROOT = '/vol/web/media/'
+STORAGES = {
+    # ...
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
