@@ -51,7 +51,7 @@ services:
       - certbot-certs:/etc/letsencrypt/
     depends_on:
       - nginx
-    command: certonly --webroot --webroot-path=/vol/www/certbot --email python.mailverify@gmail.com -d=rish-kun.live -agree-tos
+    command: certonly --webroot -w /vol/www/certbot --force-renewal --email python.mailverify@gmail.com -d=rish-kun.live -agree-tos
 
 volumes:
   certbot-web:
