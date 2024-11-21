@@ -1,4 +1,4 @@
-name: cinema-cloud
+name: cinema-cloud-final
 services:
   web:
     image: web
@@ -14,7 +14,7 @@ services:
     environment:
       - DEBUG=1
   db:
-    container_name: db
+    container_name: cinema-cloud-db
     image: postgres:16.3-alpine
     environment:
       POSTGRES_DB: "postgres"

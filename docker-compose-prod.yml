@@ -1,3 +1,4 @@
+name: cinema-cloud-final-prod
 services:
   web:
     build:
@@ -5,15 +6,22 @@ services:
       dockerfile: Dockerfile.prod
     volumes:
       - static:/static
-    command: python3 manage.py migrate && gunicorn server.wsgi:application --bind 0.0.0.0:8000
+    entrypoint:
+      [
+        "/bin/sh",
+        "-c",
+        "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn server.wsgi:application --bind 0.0.0.0:8000",
+      ]
+    # command:
     ports:
       - "8000:8000"
     env_file:
       - server/.env
     depends_on:
       - db
+
   db:
-    container_name: db-prod
+    container_name: db-final-prod
     image: postgres:16.3-alpine
     env_file:
       - .env.prod.db

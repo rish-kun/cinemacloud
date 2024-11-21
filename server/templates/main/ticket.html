@@ -1,6 +1,14 @@
 {% extends 'base2.html' %}
+{% block title %}Ticket{% endblock title %}
 {% block body %}
+
 <div class="container mx-auto px-4 py-8 max-w-5xl">
+     <div id="wrong_otp" class="hidden max-w-4xl mx-auto mb-8 p-4 bg-red-100 text-red-700 rounded-lg flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path>
+        </svg>
+        The OTP you entered was wrong
+    </div>
     {% if error %}
             <div class="mb-6 p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 border-l-4 border-red-500 text-red-700{% else %}bg-green-100 border-l-4 border-green-500 text-green-700{% endif %} flex items-center justify-between animate-fade-in-down">
                 <div class="items-center">
@@ -220,6 +228,11 @@ if (uVal === 'true') {
     const m = document.getElementById("cancelled_meal");
     m.style.display = "block";
 } 
+const w_otp = params.get('wrong_otp');
+if (w_otp === 'true') {
+    const m = document.getElementById("wrong_otp")
+    m.style.display = "block";
+}
 const url2 = window.location.origin + window.location.pathname;
 window.history.replaceState({}, '', url2);
 

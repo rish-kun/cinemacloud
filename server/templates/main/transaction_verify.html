@@ -1,4 +1,5 @@
 {% extends 'base2.html' %}
+{% block title %}Verify OTP{% endblock title %}
 {% block body %}
 
 <div class="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -55,14 +56,14 @@
             </div>
         </form>
 
-        <div class="text-center">
+        {% comment %} <div class="text-center">
             <p class="text-sm text-gray-600">
                 Didn't receive code?
                 <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
                     Resend OTP
                 </a>
             </p>
-        </div>
+        </div> {% endcomment %}
     </div>
 </div>
 

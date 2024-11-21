@@ -1,3 +1,4 @@
+from django.utils.decorators import method_decorator
 from .mail import send_email, email_body
 import datetime
 from django.shortcuts import render, redirect
@@ -10,6 +11,23 @@ from .utils import gen_otp
 # Account related views
 
 
+def is_login_check(fn=None):
+    def login_check(request):
+        try:
+            request.COOKIES['user-identity']
+        except KeyError:
+            return redirect("main:login")
+        try:
+            user = User.objects.get(uuid=request.COOKIES['user-identity'])
+        except User.DoesNotExist:
+            resp = redirect("main:login")
+            resp.delete_cookie('user-identity')
+            return resp
+        return user
+    return login_check
+
+
+# @method_decorator(is_login_check, name='dispatch')
 class IndexView(View):
     def get(self, request):
         try:
@@ -97,7 +115,7 @@ class PasswordChangeView(View):
         user = User.objects.get(uuid=request.COOKIES['user-identity'])
         old_password = request.POST['current_password']
         new_password = request.POST['new_password']
-        if bcrypt.checkpw(bytes(old_password, 'utf-8'), user.password):
+        if user.authenticate(email=user.email, password=old_password):
             user.password = bcrypt.hashpw(
                 bytes(new_password, 'utf-8'), bcrypt.gensalt())
             user.save()
@@ -222,8 +240,9 @@ class ConfirmTransactionView(View):
             return redirect("/wallet?wrong_otp=true")
 
         elif redir == "food":
+            ticket_id = request.POST['ticket_id']
+
             if otp == transaction.otp:
-                ticket_id = request.POST['ticket_id']
                 ticket = Ticket.objects.get(uuid=ticket_id)
                 ticket.food_order_confirmed = True
                 ticket.food_order_price = transaction.amount
@@ -368,7 +387,7 @@ def withdraw(request):
     send_email("OTP for CinemaCloud", email_body.format(
         otp=int(transaction.otp)), [user.email])
     transaction.save()
-    return render(request, "main/transaction_verify.html", context={"user": user, "transaction": transaction, "redirect": "withdraw"})
+    return render(request, "main/`transaction_verify`.html", context={"user": user, "transaction": transaction, "redirect": "withdraw"})
 
 
 def add(request):
