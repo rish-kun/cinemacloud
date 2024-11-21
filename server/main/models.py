@@ -95,8 +95,7 @@ class User(models.Model):
 
     def send_verification_email(self, request):
         query = VerificationQuery.objects.create(user=self)
-        link = f"{
-            request.scheme}://{request.META['HTTP_HOST']}/verify/{query.uuid}/{self.uuid}"
+        link = f"{request.scheme}://{request.META['HTTP_HOST']}/verify/{query.uuid}/{self.uuid}"
         send_email("Email Verification for CinemaCloud", verification_email.format(
             verification_link=link), [self.email])
         return True

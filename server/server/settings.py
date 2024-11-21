@@ -156,7 +156,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # DJANGO OAUTH2
-SITE_ID = 3
+SITE_ID = 4
 print(SITE_ID)
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -219,5 +219,5 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles", "static")
