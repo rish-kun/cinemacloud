@@ -1,3 +1,5 @@
+When show is deleted, refund all tickets
+
 # CinemaCloud
 
 ## Things to do:

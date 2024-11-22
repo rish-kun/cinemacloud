@@ -254,6 +254,7 @@ class ConfirmTransactionView(View):
         return render(request, "error.html", context={"error": "Invalid OTP"})
 
 
+@is_login_check
 def search_shows(request):
     query = request.GET.get('query').strip()
     print(query.lower())

@@ -32,7 +32,7 @@ services:
   nginx:
     build: ./nginx
     ports:
-      - 80:80
+      - 83:80
     volumes:
       - static_volume:/home/app/web/staticfiles
     depends_on:

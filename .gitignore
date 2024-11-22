@@ -1,4 +1,6 @@
 cert
+staticfiles/*
+staticfiles
 # Byte-compiled / optimized / DLL files
 credentials.json
 __pycache__/

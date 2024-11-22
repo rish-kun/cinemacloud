@@ -44,10 +44,10 @@ class AdminLoginView(View):
         return render(request, "th_admin/login.html", context={"error": "Invalid Credentials"})
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def admin_logout(request):
     logout(request)
-    return redirect("main:th_admin")
+    return redirect("th_admin:th_admin")
 
 
 @user_passes_test(on_admin_group, login_url="main:th_admin")
