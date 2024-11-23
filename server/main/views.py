@@ -73,15 +73,19 @@ class SignupView(View):
         email = request.POST['email']
         password = request.POST['password']
         name = request.POST['name']
-        user = User.objects.create(email=email, password=bcrypt.hashpw(
-            bytes(password, 'utf-8'), bcrypt.gensalt()), name=name.capitalize())
-        user.create_wallet()
-        user.save()
-        resp = redirect("main:index")
-        resp.set_cookie('user-identity', user.uuid)
-        #
+        try:
+            user = User.objects.get(email=email)
+            return render(request, "main/signup.html", context={"error": "User already exists"})
+        except User.DoesNotExist:
+            user = User.objects.create(email=email, password=bcrypt.hashpw(
+                bytes(password, 'utf-8'), bcrypt.gensalt()), name=name.capitalize())
+            user.create_wallet()
+            user.save()
+            resp = redirect("main:index")
+            resp.set_cookie('user-identity', user.uuid)
+            #
 
-        return resp
+            return resp
 
 
 class LogoutView(View):
