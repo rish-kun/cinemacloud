@@ -131,6 +131,7 @@ def add_food(theatre):
 def add_shows(theatre: Theatre):
     mov_list = Movie.objects.all()
     base_date = datetime.now()
+    random.seed()
     for i in range(5):
         movie = mov_list[random.randint(0, len(mov_list) - 1)]
         time = (base_date + timedelta(days=random.randint(1, 6))
