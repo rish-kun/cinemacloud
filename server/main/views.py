@@ -383,7 +383,7 @@ def withdraw(request):
     send_email("OTP for CinemaCloud", email_body.format(
         otp=int(transaction.otp)), [user.email])
     transaction.save()
-    return render(request, "main/`transaction_verify`.html", context={"user": user, "transaction": transaction, "redirect": "withdraw"})
+    return render(request, "main/transaction_verify.html", context={"user": user, "transaction": transaction, "redirect": "withdraw"})
 
 
 def add(request):
