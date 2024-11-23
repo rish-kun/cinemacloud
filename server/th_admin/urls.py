@@ -37,4 +37,8 @@ urlpatterns = [
     path("transactions", transactions, name="transactions"),
     path('transaction/<uuid:transaction_id>', transaction, name="transaction"),
     path('theatre', TheatreView.as_view(), name="theatre"),
+    path("setup", setup_view, name="setup"),
+    path("setup/movies", setup_movies_view, name="setup_movies"),
+    path("setup/shows", setup_shows, name="setup_shows"),
+    path("setup/food", setup_snacks, name="setup_food"),
 ]

@@ -42,3 +42,8 @@ server{
 Useful tutorials
 https://www.youtube.com/watch?v=r-ljiO_7MME&ab_channel=CodingWithMitch
 https://www.youtube.com/watch?v=zOPH54ltGLQ&ab_channel=CodingWithMitch
+
+## Imp commands
+
+docker healthcheck command: `docker inspect --format "{{json .State.Health }}" <container name> | jq`
+To check CPU usage: `htop`

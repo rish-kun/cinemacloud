@@ -5,7 +5,6 @@ from django.shortcuts import render, redirect
 from .models import User, Ticket, Show, Movie, Food, Transaction, TheatreAdmin, Theatre, Screen
 from django.views import View
 import bcrypt
-from .setup import setup
 from django.http import HttpResponse
 from .utils import gen_otp
 # Account related views
@@ -136,16 +135,6 @@ class AccountEditView(View):
         user.email = request.POST['email']
         user.save()
         return redirect("/account?edit=true")
-
-
-def setup_view(request):
-    setup()
-    return HttpResponse("Setup Done")
-
-
-def setup_movies_view(request):
-    setup(movies=True)
-    return HttpResponse("Setup Done")
 
 
 # ? Views related to booking/ticketing

@@ -13,8 +13,8 @@ RUN mkdir /app
 
 COPY ./server /app
 WORKDIR /app
-COPY ./scripts /scripts
-RUN chmod +x /scripts/*
+
+
 
 # RUN python3 manage.py collectstatic --noinput
 RUN python3 manage.py makemigrations 

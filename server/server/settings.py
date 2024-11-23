@@ -224,6 +224,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles", "static")
 CSRF_TRUSTED_ORIGINS = ['http://rish-kun.live', 'http://www.rish-kun.live',
                         'https://rish-kun.live', 'https://www.rish-kun.live']
 STATIC_ROOT = os. path.join(BASE_DIR, "staticfiles", "static")
-CSRF_COOKIE_DOMAIN = 'rish-kun.live'
-SITE_ID = 3
+# CSRF_COOKIE_DOMAIN = 'rish-kun.live'
+SITE_ID = 4
 print(SITE_ID)

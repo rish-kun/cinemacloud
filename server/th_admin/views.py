@@ -1,8 +1,10 @@
+from main.setup import setup, add_food, add_shows
 from django.shortcuts import render, redirect
 import random
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import login, logout
+from django.http import HttpResponse
 from django.contrib.auth.models import User as DjangoUser
 from main.models import Ticket, Show, Movie, Food, TheatreAdmin, Theatre, Screen, Transaction
 from django.http import JsonResponse
@@ -50,7 +52,7 @@ def admin_logout(request):
     return redirect("th_admin:th_admin")
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def admin_home(request):
     th_admin = TheatreAdmin.objects.get(user=request.user)
     today_shows = th_admin.theatre.get_today_shows()
@@ -58,7 +60,7 @@ def admin_home(request):
     return render(request, "th_admin/home.html", context={"theatre": TheatreAdmin.objects.get(user=request.user).theatre, "user": TheatreAdmin.objects.get(user=request.user), "today_shows": today_shows, "screens": screens})
 
 
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
+@method_decorator(user_passes_test(on_admin_group, login_url="th_admin:th_admin"), name="dispatch")
 class AdminFoodView(View):
     def get(self, request):
         user = request.user
@@ -66,7 +68,7 @@ class AdminFoodView(View):
         return render(request, "th_admin/food.html", context={"foods": th_admin.theatre.get_food()})
 
 
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
+@method_decorator(user_passes_test(on_admin_group, login_url="th_admin:th_admin"), name="dispatch")
 class EditFoodView(View):
     def get(self, request, food_id):
         food = Food.objects.get(uuid=food_id)
@@ -114,7 +116,7 @@ def delete_food_item(request, food_id):
     return redirect("th_admin:food")
 
 
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
+@method_decorator(user_passes_test(on_admin_group, login_url="th_admin:th_admin"), name="dispatch")
 class AdminShowView(View):
     def get(self, request):
         user = request.user
@@ -127,7 +129,7 @@ class AdminShowView(View):
         return render(request, "th_admin/show_tickets.html", context={"show": show, "tickets": show.get_tickets()})
 
 
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
+@method_decorator(user_passes_test(on_admin_group, login_url="th_admin:th_admin"), name="dispatch")
 class AddShowView(View):
     def get(self, request):
         user = request.user
@@ -152,7 +154,7 @@ class AddShowView(View):
         return redirect("th_admin:show")
 
 
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
+@method_decorator(user_passes_test(on_admin_group, login_url="th_admin:th_admin"), name="dispatch")
 class EditShowView(View):
     def get(self, request, show_id):
         show = Show.objects.get(uuid=show_id)
@@ -173,7 +175,7 @@ class EditShowView(View):
         return redirect("th_admin:show")
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def delete_show_view(request, show_id):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -184,14 +186,14 @@ def delete_show_view(request, show_id):
 # Theatre Admin screen views
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def screen_view(request):
     user = request.user
     theatre = TheatreAdmin.objects.get(user=user).theatre
     return render(request, "th_admin/screens.html", context={"screens": theatre.get_screens()})
 
 
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
+@method_decorator(user_passes_test(on_admin_group, login_url="th_admin:th_admin"), name="dispatch")
 class AddScreenView(View):
     def get(self, request):
         user = request.user
@@ -208,7 +210,7 @@ class AddScreenView(View):
         return redirect("th_admin:screen")
 
 
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
+@method_decorator(user_passes_test(on_admin_group, login_url="th_admin:th_admin"), name="dispatch")
 class EditScreenView(View):
     def get(self, request, screen_id):
         screen = Screen.objects.get(uuid=screen_id)
@@ -226,7 +228,7 @@ class EditScreenView(View):
         return redirect("th_admin:screen")
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def delete_screen_view(request, screen_id):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -239,7 +241,7 @@ def delete_screen_view(request, screen_id):
     return redirect("th_admin:screen")
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def admin_booking_view(request):
     theatre = TheatreAdmin.objects.get(user=request.user).theatre
     bookings = theatre.get_bookings()
@@ -253,13 +255,13 @@ def admin_booking_view(request):
     return render(request, "th_admin/bookings.html", context={"bookings": bookings, "total_booked": total_booked, "total_completed": total_completed, "total_cancelled": total_cancelled, "today_bookings": today_bookings})
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def admin_ticket_details(request, ticket_id):
     ticket = Ticket.objects.get(uuid=ticket_id)
     return render(request, "th_admin/ticket_details.html", context={"ticket": ticket, "food_orders": ticket.get_orders()})
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def admin_ticket_used(request):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -270,7 +272,7 @@ def admin_ticket_used(request):
     return redirect("th_admin:bookings")
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def admin_ticket_cancel(request):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -281,7 +283,7 @@ def admin_ticket_cancel(request):
     return redirect("th_admin:bookings")
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def register_th_admin(request):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -309,14 +311,14 @@ def register_th_admin(request):
     return redirect("th_admin:home")
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def admin_wallet_view(request):
     th_admin = TheatreAdmin.objects.get(user=request.user)
 
     return render(request, "th_admin/wallet.html", context={"user": th_admin, "wallet": th_admin.wallet, "revenue": th_admin.theatre.get_revenue(), "transactions": th_admin.get_transactions(), "food_revenue": th_admin.get_revenue_by_food(), "ticket_revenue": th_admin.get_revenue_by_ticket()})
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def transactions(request):
     user = request.user
     th_admin = TheatreAdmin.objects.get(user=user)
@@ -324,13 +326,13 @@ def transactions(request):
     return render(request, "th_admin/transactions.html", context={"transactions": th_admin.get_transactions()})
 
 
-@user_passes_test(on_admin_group, login_url="main:th_admin")
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
 def transaction(request, transaction_id):
     transaction = Transaction.objects.get(uuid=transaction_id)
     return render(request, "th_admin/transaction.html", context={"transaction": transaction})
 
 
-@method_decorator(user_passes_test(on_admin_group, login_url="main:th_admin"), name="dispatch")
+@method_decorator(user_passes_test(on_admin_group, login_url="th_admin:th_admin"), name="dispatch")
 class TheatreView(View):
     def get(self, request):
         return render(request, "th_admin/theatre.html", context={"theatre": TheatreAdmin.objects.get(user=request.user).theatre})
@@ -343,3 +345,32 @@ class TheatreView(View):
         theatre.location = location
         theatre.save()
         return redirect("th_admin:home")
+
+
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
+def setup_view(request):
+    setup()
+    return HttpResponse("Setup Done")
+
+
+# @user_passes_test(on_admin_group, login_url="th_admin:th_admin")
+def setup_movies_view(request):
+    setup(movies=True)
+    return HttpResponse("Setup Done")
+
+
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
+def setup_snacks(request):
+    user = request.user
+    theatre = TheatreAdmin.objects.get(user=user).theatre
+    print(theatre)
+    add_food(theatre)
+    return HttpResponse("Setup Done")
+
+
+@user_passes_test(on_admin_group, login_url="th_admin:th_admin")
+def setup_shows(request):
+    user = request.user
+    theatre = TheatreAdmin.objects.get(user=user).theatre
+    add_shows(theatre)
+    return HttpResponse("Setup Done")
