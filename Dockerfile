@@ -14,7 +14,7 @@ RUN mkdir /app
 COPY ./server /app
 WORKDIR /app
 
-
+COPY ./postgres/postgresql.conf /var/lib/postgresql/data/postgresql.conf
 
 # RUN python3 manage.py collectstatic --noinput
 RUN python3 manage.py makemigrations 

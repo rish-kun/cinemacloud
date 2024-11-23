@@ -51,7 +51,10 @@ class LoginView(View):
         return render(request, "main/login.html")
 
     def post(self, request):
-        user = User.authenticate(User, request)
+        try:
+            user = User.authenticate(User, request)
+        except User.DoesNotExist:
+            return render(request, "main/login.html", context={"error": "Invalid Credentials"})
         if user:
             resp = redirect("main:index")
             resp.set_cookie('user-identity', user.uuid)
