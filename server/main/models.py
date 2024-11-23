@@ -113,8 +113,7 @@ class User(models.Model):
 class Log(models.Model):
     info = models.CharField(max_length=1000)
     time = models.DateTimeField(auto_now_add=True)
-    type = models.CharField(max_length=255, choices=[(
-        'INFO', 'INFO'), ('ERROR', 'ERROR'), ('WARNING', 'WARNING')])
+    type = models.CharField(max_length=255, choices=[('INFO', 'INFO'), ('ERROR', 'ERROR'), ('WARNING', 'WARNING')])
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     pass
 
