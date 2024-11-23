@@ -108,21 +108,21 @@ def setup(movies=None):
 
 def add_food(theatre):
     demo_food_items = [
-        {'food_id': 100001, 'name': 'Popcorn', 'price': 500, 'description': 'Fresh, buttery popcorn - the perfect movie snack',
+        {'name': 'Popcorn', 'price': 500, 'description': 'Fresh, buttery popcorn - the perfect movie snack',
             'image': 'https://images.unsplash.com/photo-1585647347483-22b66260dfff'},
-        {'food_id': 100002, 'name': 'Soda', 'price': 300, 'description': 'Ice-cold refreshing soft drinks in various flavors',
+        {'name': 'Soda', 'price': 300, 'description': 'Ice-cold refreshing soft drinks in various flavors',
             'image': 'https://images.unsplash.com/photo-1581636625402-29b2a704ef13'},
-        {'food_id': 100003, 'name': 'Nachos', 'price': 400, 'description': 'Crispy tortilla chips served with melted cheese sauce',
+        {'name': 'Nachos', 'price': 400, 'description': 'Crispy tortilla chips served with melted cheese sauce',
             'image': 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d'},
-        {'food_id': 100004, 'name': 'Ice Cream', 'price': 350, 'description': 'Creamy ice cream in various delicious flavors',
+        {'name': 'Ice Cream', 'price': 350, 'description': 'Creamy ice cream in various delicious flavors',
             'image': 'https://images.unsplash.com/photo-1497034825429-c343d7c6a68f'},
-        {'food_id': 100005, 'name': 'Pizza Slice', 'price': 600, 'description': 'Hot and cheesy pizza slice with assorted toppings',
+        {'name': 'Pizza Slice', 'price': 600, 'description': 'Hot and cheesy pizza slice with assorted toppings',
             'image': 'https://images.unsplash.com/photo-1513104890138-7c749659a591'},
-        {'food_id': 100006, 'name': 'Chicken Wings', 'price': 700, 'description': 'Crispy chicken wings with your choice of sauce',
+        {'name': 'Chicken Wings', 'price': 700, 'description': 'Crispy chicken wings with your choice of sauce',
             'image': 'https://images.unsplash.com/photo-1608039755401-742074f0548d'},
-        {'food_id': 100007, 'name': 'French Fries', 'price': 400, 'description': 'Golden crispy fries seasoned to perfection',
+        {'name': 'French Fries', 'price': 400, 'description': 'Golden crispy fries seasoned to perfection',
             'image': 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877'},
-        {'food_id': 100008, 'name': 'Cheese Burger', 'price': 550, 'description': 'Classic burger with cheese and fresh vegetables',
+        {'name': 'Cheese Burger', 'price': 550, 'description': 'Classic burger with cheese and fresh vegetables',
             'image': 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd'}]
     for food_item in demo_food_items:
         Food.objects.create(**food_item, theatre=theatre)
