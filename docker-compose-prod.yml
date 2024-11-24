@@ -17,7 +17,6 @@ services:
       retries: 3
     security_opt:
       - no-new-privileges:true
-    read_only: true
 
   web:
     build:
