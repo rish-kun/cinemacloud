@@ -83,8 +83,6 @@ class SignupView(View):
             user.save()
             resp = redirect("main:index")
             resp.set_cookie('user-identity', user.uuid)
-            #
-
             return resp
 
 
