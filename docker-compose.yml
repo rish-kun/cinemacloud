@@ -17,7 +17,7 @@ services:
       - DEBUG=1
   db:
     container_name: cinema-cloud-db
-    image: postgres:16
+    image: postgres
     environment:
       POSTGRES_DB: "postgres"
       POSTGRES_USER: "postgres"
