@@ -222,9 +222,9 @@ STORAGES = {
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles", "static")
-CSRF_TRUSTED_ORIGINS = ['http://rish-kun.live', 'http://www.rish-kun.live',
-                        'https://rish-kun.live', 'https://www.rish-kun.live']
+CSRF_TRUSTED_ORIGINS = ['http://cinemacloud.rish-kun.live', 'http://www.cinemacloud.rish-kun.live',
+                        'https://cinemacloud.rish-kun.live', 'https://www.cinemacloud.rish-kun.live']
 STATIC_ROOT = os. path.join(BASE_DIR, "staticfiles", "static")
-CSRF_COOKIE_DOMAIN = 'rish-kun.live'
+CSRF_COOKIE_DOMAIN = 'cinemacloud.rish-kun.live'
 SITE_ID = int(os.getenv("SITE_ID", 4))
 print(SITE_ID)
